@@ -110,7 +110,6 @@ async function handleAddHive(event) {
             user_id: user.id,
             apiary_id: apiaryId,
             node_id: nodeId,
-            hive_name: location, // Using location as hive name
             hive_type: hiveType,
             date_installed: dateInstalled,
             queen_age: queenAge ? parseInt(queenAge) : null,
