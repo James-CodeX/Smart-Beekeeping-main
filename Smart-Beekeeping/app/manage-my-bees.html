@@ -5,6 +5,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Manage My Bees - Smart Nyuki</title>
+    <!-- IMPORTANT: Run this script before anything else to prevent sidebar flicker -->
+    <script>
+        (function(){if(localStorage.getItem('sidebarToggled')==='true'){document.documentElement.className+=' sidebar-collapsed';var s=document.createElement('style');s.innerHTML='.sidebar{width:6.5rem!important;transition:none!important}.sidebar .nav-link span,.sidebar .sidebar-brand-text{display:none!important}@media(min-width:768px){#content-wrapper{margin-left:6.5rem!important;width:calc(100% - 6.5rem)!important}}';document.head.appendChild(s)}})();
+    </script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
     <link rel="stylesheet" href="assets/css/styles.min.css">

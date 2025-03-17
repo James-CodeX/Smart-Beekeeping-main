@@ -6,6 +6,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Determine the current page to highlight the active link
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     
+    // Check if the sidebar should be toggled (collapsed)
+    const sidebarState = localStorage.getItem('sidebarToggled');
+    const isToggled = sidebarState === 'true';
+    
     // Create the standard sidebar content
     const sidebarHTML = `
       <div class="container-fluid d-flex flex-column p-0">
@@ -31,5 +35,32 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Insert the sidebar content
     sidebarPlaceholder.innerHTML = sidebarHTML;
+    
+    // Apply toggled class to the sidebar element immediately after it's created
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar && isToggled && window.innerWidth >= 768) {
+      sidebar.classList.add('toggled');
+      
+      // Also ensure other required classes are applied
+      document.documentElement.classList.add('sidebar-collapsed');
+      document.body.classList.add('sidebar-toggled');
+    }
+    
+    // Add simple click handlers to navigation links to maintain collapsed state
+    const navLinks = document.querySelectorAll('.sidebar .nav-link');
+    navLinks.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && href !== '#' && !link.getAttribute('onclick')) {
+        link.addEventListener('click', function(e) {
+          if (e.ctrlKey || e.shiftKey || e.metaKey) return;
+          
+          // If sidebar is collapsed, ensure it stays collapsed during navigation
+          const isCurrentlyToggled = document.querySelector('.sidebar').classList.contains('toggled');
+          if (isCurrentlyToggled) {
+            localStorage.setItem('sidebarToggled', 'true');
+          }
+        });
+      }
+    });
   }
 }); 
