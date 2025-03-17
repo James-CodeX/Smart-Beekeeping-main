@@ -1,0 +1,18 @@
+{
+  "name": "smart-beekeeping",
+  "version": "1.0.0",
+  "description": "Smart Beekeeping Application",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run create-env && cp -r app/* dist/",
+    "create-env": "mkdir -p dist && echo \"window.ENV = { SUPABASE_URL: '$SUPABASE_URL', SUPABASE_ANON_KEY: '$SUPABASE_ANON_KEY' };\" > dist/env.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.0.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^15.0.0"
+  },
+  "author": "",
+  "license": "MIT"
+} 
