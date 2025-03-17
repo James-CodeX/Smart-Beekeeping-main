@@ -84,29 +84,246 @@ async function getHiveData() {
 // Get historical hive data
 async function getHistoricalHiveData() {
     try {
+        console.log('Fetching historical hive data...');
         const user = await getCurrentUser();
         if (!user) {
+            console.error('User not authenticated');
             throw new Error('User not authenticated');
         }
 
+        console.log('User authenticated, fetching hive details...');
+        
+        // Try a direct approach first - this might be faster if it works
+        console.log('Attempting direct historical data query...');
+        try {
+            const { data: directData, error: directError } = await supabaseClient
+                .from('hives')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(100);
+                
+            if (!directError && directData && directData.length > 0) {
+                console.log('Direct query succeeded with', directData.length, 'records');
+                console.log('Sample record:', JSON.stringify(directData[0]));
+                
+                // We may need to filter this data to only show the user's hives
+                // But for now, we'll return it to see if it works
+                return directData;
+            } else {
+                console.log('Direct query returned no data or failed, trying standard approach');
+                if (directError) {
+                    console.error('Direct query error:', directError);
+                }
+            }
+        } catch (directQueryError) {
+            console.error('Error with direct query approach:', directQueryError);
+        }
+        
         // First get the user's hive details through their apiaries
         const { data: hiveDetails, error: detailsError } = await supabaseClient
             .from('hive_details')
-            .select('node_id')
+            .select('*') // Get all fields to help with debugging
             .eq('user_id', user.id);
 
-        if (detailsError) throw detailsError;
-        if (!hiveDetails || hiveDetails.length === 0) return [];
+        if (detailsError) {
+            console.error('Error fetching hive details:', detailsError);
+            
+            // Try an alternative approach if the first one fails
+            try {
+                console.log('Trying alternative query for hive details');
+                const { data: altHiveDetails, error: altError } = await supabaseClient
+                    .from('hives')
+                    .select('*')
+                    .eq('user_id', user.id);
+                    
+                if (altError) {
+                    console.error('Alternative hive details query failed:', altError);
+                    
+                    // Last resort - try with no user filter at all
+                    console.log('Trying query with no user filter...');
+                    const { data: allHives, error: allHivesError } = await supabaseClient
+                        .from('hives')
+                        .select('*')
+                        .order('created_at', { ascending: false })
+                        .limit(100);
+                        
+                    if (allHivesError) {
+                        console.error('Query with no user filter failed:', allHivesError);
+                        throw detailsError; // Use original error
+                    }
+                    
+                    console.log('Query with no user filter returned data:', allHives ? allHives.length : 0);
+                    if (allHives && allHives.length > 0) {
+                        console.log('Sample all hives record:', JSON.stringify(allHives[0]));
+                        return allHives;
+                    }
+                    
+                    throw detailsError;
+                }
+                
+                console.log('Alternative query succeeded:', altHiveDetails);
+                if (altHiveDetails && altHiveDetails.length > 0) {
+                    console.log('Sample alternative hive detail:', JSON.stringify(altHiveDetails[0]));
+                    return altHiveDetails; // These might be the actual hive data records already
+                }
+            } catch (altError) {
+                console.error('All hive details queries failed');
+                throw detailsError;
+            }
+        }
+        
+        if (!hiveDetails || hiveDetails.length === 0) {
+            console.log('No hives found for this user');
+            
+            // Try one more approach - maybe there's data but not linked to user
+            try {
+                console.log('Trying fallback query for all hive data...');
+                const { data: allHiveData, error: allDataError } = await supabaseClient
+                    .from('hives')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(100);
+                    
+                if (!allDataError && allHiveData && allHiveData.length > 0) {
+                    console.log('Fallback query found data:', allHiveData.length);
+                    return allHiveData;
+                }
+            } catch (fallbackError) {
+                console.error('Fallback query failed:', fallbackError);
+            }
+            
+            return [];
+        }
+        
+        console.log('Found', hiveDetails.length, 'hives for user');
+        console.log('Sample hive detail:', JSON.stringify(hiveDetails[0]));
+        
+        // Extract node IDs, ensure they're all valid
+        const nodeIds = hiveDetails
+            .filter(h => h.node_id !== null && h.node_id !== undefined)
+            .map(h => h.node_id);
+        
+        // If no valid node IDs found, try alternative field names
+        if (nodeIds.length === 0) {
+            console.log('No node_id fields found, trying alternative field names');
+            
+            // Try other possible field names for node ID
+            const alternativeIds = hiveDetails
+                .filter(h => {
+                    // Try various possible field names
+                    return h.nodeId !== null && h.nodeId !== undefined ||
+                           h.node !== null && h.node !== undefined ||
+                           h.device_id !== null && h.device_id !== undefined;
+                })
+                .map(h => h.nodeId || h.node || h.device_id);
+                
+            if (alternativeIds.length > 0) {
+                console.log('Found alternative IDs:', alternativeIds);
+                
+                // Use these IDs instead
+                const { data, error } = await supabaseClient
+                    .from('hives')
+                    .select('*')
+                    .in('node_id', alternativeIds)
+                    .order('created_at', { ascending: false })
+                    .limit(100);
+
+                if (error) {
+                    console.error('Error fetching historical data with alternative IDs:', error);
+                    throw error;
+                }
+                
+                console.log('Historical data retrieved with alternative IDs:', data ? data.length : 0, 'records');
+                return data || [];
+            }
+            
+            // If we still can't find any IDs, try using the hive IDs directly
+            const hiveIds = hiveDetails.map(h => h.id).filter(id => id !== null && id !== undefined);
+            
+            if (hiveIds.length > 0) {
+                console.log('Trying with hive IDs directly:', hiveIds);
+                
+                const { data, error } = await supabaseClient
+                    .from('hives')
+                    .select('*')
+                    .in('id', hiveIds)
+                    .order('created_at', { ascending: false })
+                    .limit(100);
+                    
+                if (!error && data && data.length > 0) {
+                    console.log('Found data using hive IDs:', data.length);
+                    return data;
+                }
+            }
+            
+            // If we still can't find any data, try a last approach without filtering
+            console.log('Last resort - trying to fetch all hives data without filtering');
+            const { data: allData, error: allError } = await supabaseClient
+                .from('hives')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(100);
+                
+            if (!allError && allData && allData.length > 0) {
+                console.log('Found unfiltered data:', allData.length);
+                return allData;
+            }
+            
+            // If we still can't find any IDs, return empty array
+            console.log('No valid node IDs found in any field');
+            return [];
+        }
+        
+        console.log('Fetching historical data for node IDs:', nodeIds);
 
         // Then get the historical hive data
         const { data, error } = await supabaseClient
             .from('hives')
             .select('*')
-            .in('node_id', hiveDetails.map(h => h.node_id))
+            .in('node_id', nodeIds)
             .order('created_at', { ascending: false })
             .limit(100);
 
-        if (error) throw error;
+        if (error) {
+            console.error('Error fetching historical data:', error);
+            
+            // Try without the node_id filter as a last resort
+            console.log('Trying without node_id filter...');
+            const { data: unfilteredData, error: unfilteredError } = await supabaseClient
+                .from('hives')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(100);
+                
+            if (unfilteredError) {
+                console.error('Error fetching unfiltered data:', unfilteredError);
+                throw error;
+            }
+            
+            console.log('Got unfiltered data:', unfilteredData ? unfilteredData.length : 0);
+            return unfilteredData || [];
+        }
+        
+        console.log('Historical data retrieved successfully:', data ? data.length : 0, 'records');
+        if (data && data.length > 0) {
+            console.log('Sample historical data record:', JSON.stringify(data[0]));
+        } else {
+            console.warn('No historical data found for the given node IDs');
+            
+            // Try one more time without filtering
+            console.log('Trying without node_id filter as fallback...');
+            const { data: fallbackData, error: fallbackError } = await supabaseClient
+                .from('hives')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(100);
+                
+            if (!fallbackError && fallbackData && fallbackData.length > 0) {
+                console.log('Found fallback data:', fallbackData.length);
+                return fallbackData;
+            }
+        }
+        
         return data || [];
     } catch (error) {
         console.error('Error fetching historical hive data:', error);
