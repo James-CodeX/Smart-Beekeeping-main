@@ -70,9 +70,25 @@
                     <div class="card shadow mb-4">
                         <div class="card-header py-3 d-flex justify-content-between align-items-center">
                             <h6 class="text-primary m-0 fw-bold">Filter Options</h6>
-                            <button id="applyFilters" class="btn btn-primary btn-sm">
-                                <i class="fas fa-filter me-1"></i> Apply Filters
-                            </button>
+                            <div class="mb-4">
+                                <div class="btn-group me-2" role="group">
+                                    <button class="btn btn-primary" id="applyFilters">
+                                        <i class="fas fa-filter me-1"></i> Apply Filters
+                                    </button>
+                                    <button class="btn btn-secondary" id="resetFilters">
+                                        <i class="fas fa-undo me-1"></i> Reset Filters
+                                    </button>
+                                </div>
+                                <button class="btn btn-info me-2" id="exportData">
+                                    <i class="fas fa-file-export me-1"></i> Export Data
+                                </button>
+                                <button class="btn btn-warning" id="clearTableData" title="Clear cached data and reload from server">
+                                    <i class="fas fa-eraser me-1"></i> Clear Table Data
+                                </button>
+                                <button class="btn btn-danger" id="debugData" style="display: none;">
+                                    <i class="fas fa-bug me-1"></i> Debug Data
+                                </button>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -95,22 +111,6 @@
                                     <div class="input-group">
                                         <input type="text" id="dateRangeSelector" class="form-control" placeholder="Select date range...">
                                         <span class="input-group-text"><i class="fas fa-calendar"></i></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mt-2">
-                                <div class="col-12">
-                                    <div class="d-flex justify-content-end">
-                                        <button id="resetFilters" class="btn btn-outline-secondary btn-sm me-2">
-                                            <i class="fas fa-undo me-1"></i> Reset Filters
-                                        </button>
-                                        <button id="exportData" class="btn btn-outline-success btn-sm">
-                                            <i class="fas fa-file-export me-1"></i> Export Data
-                                        </button>
-                                        <!-- Add debug button (only visible in development/localhost) -->
-                                        <button id="debugData" class="btn btn-outline-danger btn-sm ms-2" style="display: none;">
-                                            <i class="fas fa-bug me-1"></i> Debug Data
-                                        </button>
                                     </div>
                                 </div>
                             </div>
