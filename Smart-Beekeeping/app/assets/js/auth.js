@@ -1,22 +1,34 @@
 // Initialize Supabase client
-const SUPABASE_URL = 'https://bjmdehrjrvbojtewvltf.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbWRlaHJqcnZib2p0ZXd2bHRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkzNTc4MjMsImV4cCI6MjA1NDkzMzgyM30.8MYy2CGMAKjO0qa62_xgADKegrgmMTdInCVQeilg2X8'
+const { createClient } = supabase;
+const supabaseClient = createClient(
+    config.getSupabaseUrl(),
+    config.getSupabaseAnonKey()
+);
 
-const { createClient } = supabase
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+console.log('Supabase client initialized');
 
 // Basic auth check function
 async function checkAuth() {
     const currentPath = window.location.pathname;
+    console.log('Checking auth on page:', currentPath);
     
     // Skip auth check for login and register pages
     if (currentPath.includes('login.html') || currentPath.includes('register.html')) {
+        console.log('Skipping auth check on login/register page');
         return;
     }
 
     const { data: { session }, error } = await supabaseClient.auth.getSession();
+    
+    if (error) {
+        console.error('Auth check error:', error);
+    }
+    
     if (!session) {
+        console.log('No active session found, redirecting to login');
         window.location.href = 'login.html';
+    } else {
+        console.log('User authenticated successfully:', session.user.email);
     }
 }
 
@@ -196,22 +208,36 @@ async function getCurrentUser() {
 
 // Update profile UI
 async function updateProfileUI() {
-    const user = await getCurrentUser();
-    if (user) {
-        const profileNameElement = document.querySelector('.text-gray-600.small');
-        if (profileNameElement) {
-            const { data: profile, error } = await supabaseClient
-                .from('profiles')
-                .select('full_name')
-                .eq('id', user.id)
-                .single();
+    try {
+        const user = await getCurrentUser();
+        if (user) {
+            // Look for profile elements by various common selectors
+            const profileElements = document.querySelectorAll('.text-gray-600.small, .d-none.d-lg-inline.me-2.text-gray-600.small');
+            
+            if (profileElements.length > 0) {
+                // Get the user's profile data
+                const { data: profile, error } = await supabaseClient
+                    .from('profiles')
+                    .select('full_name')
+                    .eq('id', user.id)
+                    .single();
 
-            if (!error && profile) {
-                profileNameElement.textContent = profile.full_name || user.email;
+                // Update all matching profile elements
+                profileElements.forEach(element => {
+                    if (!error && profile) {
+                        element.textContent = profile.full_name || user.email;
+                    } else {
+                        element.textContent = user.email;
+                    }
+                });
+                
+                console.log('Profile UI updated successfully');
             } else {
-                profileNameElement.textContent = user.email;
+                console.log('No profile elements found on this page');
             }
         }
+    } catch (error) {
+        console.error('Error updating profile UI:', error);
     }
 }
 
