@@ -1,0 +1,60 @@
+/* Dashboard specific styles */
+.chart-area {
+  position: relative;
+  height: 20rem;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .chart-area {
+    height: 15rem;
+  }
+}
+
+/* Fix status cards */
+.border-left-primary {
+  border-left: 0.25rem solid #4e73df !important;
+}
+
+.border-left-success {
+  border-left: 0.25rem solid #1cc88a !important;
+}
+
+.border-left-info {
+  border-left: 0.25rem solid #36b9cc !important;
+}
+
+.border-left-warning {
+  border-left: 0.25rem solid #f6c23e !important;
+}
+
+/* Ensure status cards look good on all screen sizes */
+.card-body {
+  padding: 1.25rem;
+}
+
+/* Dashboard metrics spacing */
+.d-sm-flex .mb-0 {
+  margin-bottom: 0 !important;
+}
+
+/* Fix for scroll to top button */
+.scroll-to-top {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 100;
+}
+
+/* Make charts responsive */
+canvas {
+  max-width: 100%;
+}
+
+/* Fix topbar padding on mobile */
+@media (max-width: 768px) {
+  .topbar {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+} 
