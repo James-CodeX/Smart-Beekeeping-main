@@ -1,11 +1,17 @@
 // Initialize Supabase client
-const { createClient } = supabase;
-const supabaseClient = createClient(
-    config.getSupabaseUrl(),
-    config.getSupabaseAnonKey()
-);
-
-console.log('Supabase client initialized');
+let supabaseClient;
+try {
+    const { createClient } = supabase;
+    supabaseClient = createClient(
+        config.getSupabaseUrl(),
+        config.getSupabaseAnonKey()
+    );
+    console.log('Supabase client initialized');
+} catch (error) {
+    console.error('Failed to initialize Supabase client:', error);
+    // Don't alert here, as it would block the UI before we can handle auth properly
+    supabaseClient = null;
+}
 
 // Basic auth check function
 async function checkAuth() {
@@ -18,17 +24,27 @@ async function checkAuth() {
         return;
     }
 
-    const { data: { session }, error } = await supabaseClient.auth.getSession();
-    
-    if (error) {
-        console.error('Auth check error:', error);
-    }
-    
-    if (!session) {
-        console.log('No active session found, redirecting to login');
+    try {
+        if (!supabaseClient) {
+            throw new Error('Supabase client not initialized');
+        }
+
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        
+        if (error) {
+            console.error('Auth check error:', error);
+        }
+        
+        if (!session) {
+            console.log('No active session found, redirecting to login');
+            window.location.href = 'login.html';
+        } else {
+            console.log('User authenticated successfully:', session.user.email);
+        }
+    } catch (error) {
+        console.error('Critical auth error:', error);
+        alert('There was an error with authentication. Please try logging in again.');
         window.location.href = 'login.html';
-    } else {
-        console.log('User authenticated successfully:', session.user.email);
     }
 }
 
