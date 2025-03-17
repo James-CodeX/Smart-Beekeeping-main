@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Hive Details - Smart Nyuki</title>
+    <!-- IMPORTANT: Run this script before anything else to prevent sidebar flicker -->
+    <script>
+        (function(){if(localStorage.getItem('sidebarToggled')==='true'){document.documentElement.className+=' sidebar-collapsed';var s=document.createElement('style');s.innerHTML='.sidebar{width:6.5rem!important;transition:none!important}.sidebar .nav-link span,.sidebar .sidebar-brand-text{display:none!important}@media(min-width:768px){#content-wrapper{margin-left:6.5rem!important;width:calc(100% - 6.5rem)!important}}';document.head.appendChild(s)}})();
+    </script>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="assets/css/styles.min.css">
+    <link rel="stylesheet" href="assets/css/smart-nyuki-theme.css">
+    <link rel="stylesheet" href="assets/css/sidebar.css">
+    <style>
+        .metric-card {
+            border-radius: 10px;
+            transition: transform 0.2s;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .health-indicator {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        .health-excellent {
+            background-color: #2ecc71;
+        }
+        .health-good {
+            background-color: #27ae60;
+        }
+        .health-caution {
+            background-color: #f39c12;
+        }
+        .health-warning {
+            background-color: #e74c3c;
+        }
+        .health-critical {
+            background-color: #c0392b;
+            animation: pulse 1.5s infinite;
+        }
+        .metric-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .progress-bar-temp {
+            background: linear-gradient(90deg, #2ecc71, #f39c12, #e74c3c);
+        }
+        .progress-bar-humidity {
+            background: linear-gradient(90deg, #3498db, #2980b9);
+        }
+        .progress-bar-sound {
+            background: linear-gradient(90deg, #9b59b6, #8e44ad);
+        }
+        .progress-bar-weight {
+            background: linear-gradient(90deg, #f1c40f, #f39c12);
+        }
+        .chart-container {
+            height: 250px;
+            position: relative;
+        }
+        .mini-chart-container {
+            height: 100px;
+            position: relative;
+        }
+        .info-card {
+            border-radius: 10px;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #2ecc71, #3498db, #9b59b6, #f1c40f);
+        }
+        .action-button {
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+        .action-button:hover {
+            transform: scale(1.05);
+        }
+        .metric-icon {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+            opacity: 0.7;
+        }
+        .metric-trend {
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+            transition: all 0.3s;
+        }
+        .trend-up {
+            color: #e74c3c;
+        }
+        .trend-down {
+            color: #2ecc71;
+        }
+        .trend-stable {
+            color: #95a5a6;
+        }
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            border-radius: 10px;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-left-color: #1cc88a;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        .unit {
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+        .range-indicator {
+            font-size: 0.75rem;
+            color: #7b8a8b;
+            margin-top: 0.25rem;
+        }
+        .health-metric {
+            transition: all 0.3s;
+        }
+        .health-metric:hover {
+            transform: translateY(-3px);
+        }
+        .health-score-card {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #f6f9fc, #f1f5f9);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .health-score {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+            background: linear-gradient(90deg, #2ecc71, #3498db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .recommendation-item {
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+        }
+        .recommendation-critical {
+            border-left-color: #e74c3c;
+            background-color: #fef5f5;
+        }
+        .recommendation-warning {
+            border-left-color: #f39c12;
+            background-color: #fef9ef;
+        }
+        .recommendation-info {
+            border-left-color: #3498db;
+            background-color: #f0f7fc;
+        }
+        .recommendation-success {
+            border-left-color: #2ecc71;
+            background-color: #f0fcf5;
+        }
+        .timeline-container {
+            position: relative;
+            padding-left: 30px;
+        }
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background: #e9ecef;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #3498db;
+            border: 2px solid #fff;
+        }
+        .time-period-selector .btn {
+            border-radius: 20px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+        }
+        .health-badge {
+            padding: 0.35rem 0.65rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .sensor-status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 0.25rem;
+        }
+        .sensor-status-active {
+            background-color: #2ecc71;
+        }
+        .sensor-status-warning {
+            background-color: #f39c12;
+        }
+        .sensor-status-inactive {
+            background-color: #e74c3c;
+        }
+    </style>
+</head>
+
+<body id="page-top">
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <nav class="navbar align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0 navbar-dark" id="sidebar-placeholder">
+            <!-- Sidebar content will be injected by sidebar-template.js -->
+        </nav>
+        
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+                <nav class="navbar navbar-expand bg-white shadow mb-4 topbar static-top navbar-light">
+                    <div class="container-fluid">
+                        <button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <ul class="navbar-nav flex-nowrap ms-auto">
+                            <div class="d-none d-sm-block topbar-divider"></div>
+                            <li class="nav-item dropdown no-arrow">
+                                <div class="nav-item dropdown no-arrow">
+                                    <a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#">
+                                        <span class="d-none d-lg-inline me-2 text-gray-600 small">Loading...</span>
+                                        <img class="border rounded-circle img-profile" src="https://ui-avatars.com/api/?background=0D8ABC&color=fff" alt="Profile">
+                                    </a>
+                                    <div class="dropdown-menu shadow dropdown-menu-end animated--grow-in">
+                                        <a class="dropdown-item" href="profile.html">
+                                            <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>Profile
+                                        </a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#" onclick="handleLogout()">
+                                            <i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>Logout
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                <div class="container-fluid">
+                    <!-- Navigation breadcrumb -->
+                    <div class="mb-3">
+                        <a href="manage-my-bees.html" class="text-decoration-none text-muted">
+                            <i class="fas fa-home"></i> Apiaries
+                        </a>
+                        <span class="mx-1">/</span>
+                        <a href="#" id="apiary-link" class="text-decoration-none text-muted">
+                            <span id="apiaryName">Apiary</span>
+                        </a>
+                        <span class="mx-1">/</span>
+                        <span class="text-primary" id="hiveName">Hive Details</span>
+                    </div>
+
+                    <!-- Hive header with status -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <div class="d-flex align-items-center">
+                                <h3 class="text-dark mb-0" id="hiveDetailTitle">Hive Details</h3>
+                                <span class="ms-3 health-badge bg-success text-white" id="healthStatus">
+                                    <i class="fas fa-check-circle me-1"></i> Healthy
+                                </span>
+                            </div>
+                            <p class="text-muted mb-0">
+                                <span id="hiveLocation">Location: Mountain View Apiary</span> • 
+                                <span id="hiveType">Type: Langstroth</span> • 
+                                <span id="hiveDateInstalled">Installed: Jan 15, 2023</span>
+                            </p>
+                        </div>
+                        <div>
+                            <div class="btn-group">
+                                <button class="btn btn-outline-secondary me-2 action-button" id="editHiveBtn">
+                                    <i class="fas fa-edit"></i> Edit Hive
+                                </button>
+                                <button class="btn btn-primary action-button" id="addNoteBtn">
+                                    <i class="fas fa-plus"></i> Add Note
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Time Period Selector -->
+                    <div class="card shadow mb-4">
+                        <div class="card-body py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="time-period-selector">
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-outline-primary active" data-timeperiod="24h">24h</button>
+                                        <button type="button" class="btn btn-outline-primary" data-timeperiod="7d">7 days</button>
+                                        <button type="button" class="btn btn-outline-primary" data-timeperiod="30d">30 days</button>
+                                        <button type="button" class="btn btn-outline-primary" data-timeperiod="custom">Custom</button>
+                                    </div>
+                                </div>
+                                <div id="lastUpdated" class="text-muted small">
+                                    <i class="fas fa-sync-alt me-1"></i> Last updated: <span id="updateTime">Just now</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Health Score Summary -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card shadow h-100">
+                                <div class="card-body health-score-card">
+                                    <h6 class="text-uppercase text-muted">Hive Health Score</h6>
+                                    <div class="health-score" id="overallHealthScore">87</div>
+                                    <p class="text-muted mb-0">Based on sensor data analysis</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="card shadow h-100">
+                                <div class="card-body">
+                                    <h6 class="text-uppercase text-muted mb-3">Health Indicators</h6>
+                                    <div class="row">
+                                        <div class="col-md-3 health-metric">
+                                            <div class="d-flex align-items-center">
+                                                <span class="health-indicator health-excellent"></span>
+                                                <div>
+                                                    <div class="fw-bold">Temperature</div>
+                                                    <div class="small text-muted">Excellent</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 health-metric">
+                                            <div class="d-flex align-items-center">
+                                                <span class="health-indicator health-good"></span>
+                                                <div>
+                                                    <div class="fw-bold">Humidity</div>
+                                                    <div class="small text-muted">Good</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 health-metric">
+                                            <div class="d-flex align-items-center">
+                                                <span class="health-indicator health-caution"></span>
+                                                <div>
+                                                    <div class="fw-bold">Sound Level</div>
+                                                    <div class="small text-muted">Caution</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 health-metric">
+                                            <div class="d-flex align-items-center">
+                                                <span class="health-indicator health-excellent"></span>
+                                                <div>
+                                                    <div class="fw-bold">Weight</div>
+                                                    <div class="small text-muted">Excellent</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Metrics Charts Section -->
+                    <div class="row mb-4">
+                        <!-- Temperature Chart -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow h-100">
+                                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                    <h6 class="m-0 font-weight-bold text-primary">
+                                        <i class="fas fa-temperature-high me-1 text-danger"></i> Temperature
+                                    </h6>
+                                    <div class="d-flex align-items-center">
+                                        <span class="text-success me-2" id="tempCurrentValue">33.6 °C</span>
+                                        <span class="badge bg-light text-dark" id="tempStatus">Normal</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="temperatureChart"></canvas>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <span class="range-indicator" id="tempMin">Min: 31.2 °C</span>
+                                        <span class="range-indicator" id="tempAvg">Avg: 33.4 °C</span>
+                                        <span class="range-indicator" id="tempMax">Max: 35.8 °C</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Humidity Chart -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow h-100">
+                                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                    <h6 class="m-0 font-weight-bold text-primary">
+                                        <i class="fas fa-tint me-1 text-primary"></i> Humidity
+                                    </h6>
+                                    <div class="d-flex align-items-center">
+                                        <span class="text-primary me-2" id="humidityCurrentValue">42 %</span>
+                                        <span class="badge bg-light text-dark" id="humidityStatus">Normal</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="humidityChart"></canvas>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <span class="range-indicator" id="humidityMin">Min: 38 %</span>
+                                        <span class="range-indicator" id="humidityAvg">Avg: 42 %</span>
+                                        <span class="range-indicator" id="humidityMax">Max: 47 %</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sound Level Chart -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow h-100">
+                                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                    <h6 class="m-0 font-weight-bold text-primary">
+                                        <i class="fas fa-volume-up me-1 text-purple"></i> Sound Level
+                                    </h6>
+                                    <div class="d-flex align-items-center">
+                                        <span class="text-purple me-2" id="soundCurrentValue">54 dB</span>
+                                        <span class="badge bg-warning text-dark" id="soundStatus">Elevated</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="soundChart"></canvas>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <span class="range-indicator" id="soundMin">Min: 35 dB</span>
+                                        <span class="range-indicator" id="soundAvg">Avg: 52 dB</span>
+                                        <span class="range-indicator" id="soundMax">Max: 75 dB</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Weight Chart -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow h-100">
+                                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                    <h6 class="m-0 font-weight-bold text-primary">
+                                        <i class="fas fa-weight me-1 text-warning"></i> Weight
+                                    </h6>
+                                    <div class="d-flex align-items-center">
+                                        <span class="text-warning me-2" id="weightCurrentValue">20.0 kg</span>
+                                        <span class="badge bg-light text-dark" id="weightStatus">Normal</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="weightChart"></canvas>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <span class="range-indicator" id="weightMin">Min: 18.2 kg</span>
+                                        <span class="range-indicator" id="weightAvg">Avg: 19.3 kg</span>
+                                        <span class="range-indicator" id="weightMax">Max: 20.5 kg</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Health Insights and Recommendations -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow h-100">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">
+                                        <i class="fas fa-lightbulb me-1 text-warning"></i> Recommendations
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div id="recommendationsContainer">
+                                        <div class="recommendation-item recommendation-warning">
+                                            <div class="fw-bold"><i class="fas fa-exclamation-triangle me-1"></i> Sound level fluctuations detected</div>
+                                            <p class="mb-0 small">Increased sound levels may indicate stress or swarming preparation. Consider inspection within 48 hours.</p>
+                                        </div>
+                                        <div class="recommendation-item recommendation-info">
+                                            <div class="fw-bold"><i class="fas fa-info-circle me-1"></i> Steady weight increase</div>
+                                            <p class="mb-0 small">Hive is showing healthy nectar collection. Weight has increased by 1.2kg over the past week.</p>
+                                        </div>
+                                        <div class="recommendation-item recommendation-success">
+                                            <div class="fw-bold"><i class="fas fa-check-circle me-1"></i> Temperature well maintained</div>
+                                            <p class="mb-0 small">Colony is effectively regulating temperature despite external fluctuations. Good sign of healthy population.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow h-100">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">
+                                        <i class="fas fa-clipboard-list me-1 text-info"></i> Hive Activity Log
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="timeline-container" id="activityLogContainer">
+                                        <div class="timeline-item">
+                                            <div class="fw-bold">Temperature spike detected</div>
+                                            <p class="mb-0 small">Temperature rose to 35.8°C for approximately 2 hours.</p>
+                                            <div class="text-muted smaller">Today, 10:23 AM</div>
+                                        </div>
+                                        <div class="timeline-item">
+                                            <div class="fw-bold">Weight increase</div>
+                                            <p class="mb-0 small">Weight increased by 0.4kg, indicating good nectar collection.</p>
+                                            <div class="text-muted smaller">Yesterday, 7:45 PM</div>
+                                        </div>
+                                        <div class="timeline-item">
+                                            <div class="fw-bold">Humidity normalized</div>
+                                            <p class="mb-0 small">Humidity returned to normal range after rainy period.</p>
+                                            <div class="text-muted smaller">Aug 10, 2023, 3:15 PM</div>
+                                        </div>
+                                        <div class="timeline-item">
+                                            <div class="fw-bold">Manual inspection conducted</div>
+                                            <p class="mb-0 small">Healthy brood pattern observed. Queen spotted.</p>
+                                            <div class="text-muted smaller">Aug 7, 2023, 11:30 AM</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Information Section -->
+                    <div class="row mb-4">
+                        <!-- Hive Details Card -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card shadow h-100">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">
+                                        <i class="fas fa-info-circle me-1"></i> Hive Information
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-borderless">
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-muted">Node ID</td>
+                                                <td id="nodeId">000A1B2C3D4E</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-muted">Hive Type</td>
+                                                <td id="hiveTypeDetail">Langstroth</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-muted">Queen Age</td>
+                                                <td id="queenAge">7 months</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-muted">Date Installed</td>
+                                                <td id="dateInstalled">January 15, 2023</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-muted">Last Inspection</td>
+                                                <td id="lastInspection">August 7, 2023</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Notes Card -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card shadow h-100">
+                                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                    <h6 class="m-0 font-weight-bold text-primary">
+                                        <i class="fas fa-sticky-note me-1"></i> Notes
+                                    </h6>
+                                    <button id="addNoteBtn2" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-plus me-1"></i> Add Note
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div id="notesContainer">
+                                        <div class="text-center my-3 text-muted">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div> Loading notes...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sensor Status Card -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card shadow h-100">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">
+                                        <i class="fas fa-microchip me-1"></i> Sensor Status
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-borderless">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="sensor-status-indicator sensor-status-active"></span>
+                                                        Temperature Sensor
+                                                    </div>
+                                                </td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="sensor-status-indicator sensor-status-active"></span>
+                                                        Humidity Sensor
+                                                    </div>
+                                                </td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="sensor-status-indicator sensor-status-warning"></span>
+                                                        Sound Sensor
+                                                    </div>
+                                                </td>
+                                                <td><span class="badge bg-warning text-dark">Intermittent</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="sensor-status-indicator sensor-status-active"></span>
+                                                        Weight Sensor
+                                                    </div>
+                                                </td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="sensor-status-indicator sensor-status-active"></span>
+                                                        Battery Status
+                                                    </div>
+                                                </td>
+                                                <td><span class="badge bg-success">85%</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="small text-muted mt-3">
+                                        Last data transmission: <span id="lastDataTransmission">Today, 11:45 AM</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inspections & Equipment Section -->
+                    <div class="row">
+                        <!-- Inspection History -->
+                        <div class="col-lg-8 mb-4">
+                            <div class="card shadow">
+                                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                    <h6 class="m-0 font-weight-bold text-primary">
+                                        <i class="fas fa-clipboard-check me-1"></i> Inspection History
+                                    </h6>
+                                    <button id="addInspectionBtn" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-plus me-1"></i> Add Inspection
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div id="inspectionHistoryContainer">
+                                        <div class="text-center my-3 text-muted">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div> Loading inspection history...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Equipment Tracking -->
+                        <div class="col-lg-4 mb-4">
+                            <div class="card shadow">
+                                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                    <h6 class="m-0 font-weight-bold text-primary">
+                                        <i class="fas fa-tools me-1"></i> Equipment
+                                    </h6>
+                                    <button id="addEquipmentBtn" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-plus me-1"></i> Add Equipment
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div id="equipmentContainer">
+                                        <div class="text-center my-3 text-muted">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div> Loading equipment data...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Export Data Button -->
+                    <div class="row mb-4">
+                        <div class="col-12 text-end">
+                            <button id="exportDataBtn" class="btn btn-outline-primary">
+                                <i class="fas fa-file-export me-1"></i> Export Hive Data
+                            </button>
+                            <button id="deleteHiveBtn" class="btn btn-outline-danger ms-2">
+                                <i class="fas fa-trash me-1"></i> Delete Hive
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="bg-white sticky-footer">
+                <div class="container my-auto">
+                    <div class="text-center my-auto copyright"><span>Copyright © Smart Nyuki 2025</span></div>
+                </div>
+            </footer>
+        </div>
+        <a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+    </div>
+
+    <!-- Add Inspection Modal -->
+    <div class="modal fade" id="addInspectionModal" tabindex="-1" aria-labelledby="addInspectionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addInspectionModalLabel">Add Hive Inspection</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="addInspectionForm">
+                    <div class="modal-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="inspectionDate" class="form-label">Inspection Date*</label>
+                                <input type="date" class="form-control" id="inspectionDate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="inspectionType" class="form-label">Inspection Type*</label>
+                                <select class="form-select" id="inspectionType" required>
+                                    <option value="">Select Type</option>
+                                    <option value="Routine">Routine</option>
+                                    <option value="Health Check">Health Check</option>
+                                    <option value="Honey Harvest">Honey Harvest</option>
+                                    <option value="Queen Check">Queen Check</option>
+                                    <option value="Winter Prep">Winter Prep</option>
+                                    <option value="Emergency">Emergency</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="queenSighted">
+                                    <label class="form-check-label" for="queenSighted">
+                                        Queen Sighted
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="broodPattern" class="form-label">Brood Pattern</label>
+                                <select class="form-select" id="broodPattern">
+                                    <option value="">Select Pattern</option>
+                                    <option value="Excellent">Excellent</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Fair">Fair</option>
+                                    <option value="Poor">Poor</option>
+                                    <option value="None">None</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="hiveStrength" class="form-label">Hive Strength</label>
+                                <select class="form-select" id="hiveStrength">
+                                    <option value="">Select Strength</option>
+                                    <option value="Very Strong">Very Strong</option>
+                                    <option value="Strong">Strong</option>
+                                    <option value="Moderate">Moderate</option>
+                                    <option value="Weak">Weak</option>
+                                    <option value="Very Weak">Very Weak</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="honeyStores" class="form-label">Honey Stores</label>
+                                <select class="form-select" id="honeyStores">
+                                    <option value="">Select Stores</option>
+                                    <option value="Abundant">Abundant</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Moderate">Moderate</option>
+                                    <option value="Low">Low</option>
+                                    <option value="None">None</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="pestsSighted" class="form-label">Pests Sighted</label>
+                                <input type="text" class="form-control" id="pestsSighted" placeholder="e.g., Varroa, Small Hive Beetle">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="diseasesSighted" class="form-label">Diseases Sighted</label>
+                                <input type="text" class="form-control" id="diseasesSighted" placeholder="e.g., Chalkbrood, Nosema">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newHealthStatus" class="form-label">Update Hive Health Status</label>
+                            <select class="form-select" id="newHealthStatus">
+                                <option value="">No Change</option>
+                                <option value="Excellent">Excellent</option>
+                                <option value="Good">Good</option>
+                                <option value="Caution">Caution</option>
+                                <option value="Warning">Warning</option>
+                                <option value="Critical">Critical</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inspectionNotes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="inspectionNotes" rows="3" placeholder="Enter detailed notes about this inspection"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Inspection</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Equipment Modal -->
+    <div class="modal fade" id="addEquipmentModal" tabindex="-1" aria-labelledby="addEquipmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addEquipmentModalLabel">Add Hive Equipment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="addEquipmentForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="equipmentType" class="form-label">Equipment Type*</label>
+                            <select class="form-select" id="equipmentType" required>
+                                <option value="">Select Type</option>
+                                <option value="Brood Box">Brood Box</option>
+                                <option value="Super">Super</option>
+                                <option value="Queen Excluder">Queen Excluder</option>
+                                <option value="Bottom Board">Bottom Board</option>
+                                <option value="Top Cover">Top Cover</option>
+                                <option value="Inner Cover">Inner Cover</option>
+                                <option value="Frames">Frames</option>
+                                <option value="Feeder">Feeder</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="equipmentDate" class="form-label">Date Added*</label>
+                            <input type="date" class="form-control" id="equipmentDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="equipmentCondition" class="form-label">Condition*</label>
+                            <select class="form-select" id="equipmentCondition" required>
+                                <option value="">Select Condition</option>
+                                <option value="New">New</option>
+                                <option value="Good">Good</option>
+                                <option value="Fair">Fair</option>
+                                <option value="Poor">Poor</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="equipmentNotes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="equipmentNotes" rows="2" placeholder="Additional information about the equipment"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Equipment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Note Modal -->
+    <div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addNoteModalLabel">Add Hive Note</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="addNoteForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="noteContent" class="form-label">Note</label>
+                            <textarea class="form-control" id="noteContent" rows="3" placeholder="Enter your observations or notes about this hive"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Note</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="env.js"></script>
+    <script src="assets/js/script.min.js"></script>
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/sidebar-template.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <script src="assets/js/hive-details.js"></script>
+</body>
+
+</html> 

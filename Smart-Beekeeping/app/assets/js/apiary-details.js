@@ -154,7 +154,7 @@ async function loadHives(apiaryId) {
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in">
                                     <div class="dropdown-header">Hive Actions:</div>
-                                    <a class="dropdown-item" href="index.html?hive=${hive.id}">View Dashboard</a>
+                                    <a class="dropdown-item" href="hive-details.html?id=${hive.id}">View Dashboard</a>
                                     <a class="dropdown-item" href="#" onclick="editHive(${hive.id})">Edit Details</a>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item text-danger" href="#" onclick="deleteHive(${hive.id})">Delete</a>
@@ -191,7 +191,7 @@ async function loadHives(apiaryId) {
                                 </div>
                             </div>
                             <div class="text-center mt-3">
-                                <a href="index.html?hive=${hive.id}" class="btn btn-primary btn-sm view-details-btn">View Details <i class="fas fa-arrow-right ms-1"></i></a>
+                                <a href="hive-details.html?id=${hive.id}" class="btn btn-primary btn-sm view-details-btn">View Details <i class="fas fa-arrow-right ms-1"></i></a>
                             </div>
                         </div>
                     </div>
