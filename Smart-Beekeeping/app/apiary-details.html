@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Apiary Details - Smart Nyuki</title>
+    <!-- IMPORTANT: Run this script before anything else to prevent sidebar flicker -->
+    <script>
+        (function(){if(localStorage.getItem('sidebarToggled')==='true'){document.documentElement.className+=' sidebar-collapsed';var s=document.createElement('style');s.innerHTML='.sidebar{width:6.5rem!important;transition:none!important}.sidebar .nav-link span,.sidebar .sidebar-brand-text{display:none!important}@media(min-width:768px){#content-wrapper{margin-left:6.5rem!important;width:calc(100% - 6.5rem)!important}}';document.head.appendChild(s)}})();
+    </script>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="assets/css/styles.min.css">
+    <link rel="stylesheet" href="assets/css/smart-nyuki-theme.css">
+    <link rel="stylesheet" href="assets/css/sidebar.css">
+    <style>
+        .metric-card {
+            border-radius: 10px;
+            transition: transform 0.2s;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .metric-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .progress-bar-temp {
+            background: linear-gradient(90deg, #2ecc71, #f39c12, #e74c3c);
+        }
+        .progress-bar-humidity {
+            background: linear-gradient(90deg, #3498db, #2980b9);
+        }
+        .progress-bar-sound {
+            background: linear-gradient(90deg, #9b59b6, #8e44ad);
+        }
+        .progress-bar-weight {
+            background: linear-gradient(90deg, #f1c40f, #f39c12);
+        }
+        .chart-container {
+            height: 100px;
+            position: relative;
+        }
+        .hive-card {
+            border-radius: 10px;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .hive-card:hover {
+            transform: translateY(-5px);
+        }
+        .hive-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #2ecc71, #3498db, #9b59b6, #f1c40f);
+        }
+        .view-details-btn {
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+        .view-details-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .location-pin {
+            color: #6c757d;
+        }
+        .action-button {
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+        .action-button:hover {
+            transform: scale(1.05);
+        }
+        .metric-icon {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+            opacity: 0.7;
+        }
+        .metric-trend {
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+            transition: all 0.3s;
+        }
+        .trend-up {
+            color: #e74c3c;
+        }
+        .trend-down {
+            color: #2ecc71;
+        }
+        .trend-stable {
+            color: #95a5a6;
+        }
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            border-radius: 10px;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-left-color: #1cc88a;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        .unit {
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body id="page-top">
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <nav class="navbar align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0 navbar-dark" id="sidebar-placeholder">
+            <!-- Sidebar content will be injected by sidebar-template.js -->
+        </nav>
+        
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+                <nav class="navbar navbar-expand bg-white shadow mb-4 topbar static-top navbar-light">
+                    <div class="container-fluid">
+                        <button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <ul class="navbar-nav flex-nowrap ms-auto">
+                            <div class="d-none d-sm-block topbar-divider"></div>
+                            <li class="nav-item dropdown no-arrow">
+                                <div class="nav-item dropdown no-arrow">
+                                    <a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#">
+                                        <span class="d-none d-lg-inline me-2 text-gray-600 small">Loading...</span>
+                                        <img class="border rounded-circle img-profile" src="https://ui-avatars.com/api/?background=0D8ABC&color=fff" alt="Profile">
+                                    </a>
+                                    <div class="dropdown-menu shadow dropdown-menu-end animated--grow-in">
+                                        <a class="dropdown-item" href="profile.html">
+                                            <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>Profile
+                                        </a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#" onclick="handleLogout()">
+                                            <i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>Logout
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <a href="manage-my-bees.html" class="btn btn-outline-primary mb-2">
+                                <i class="fas fa-arrow-left"></i> Back to Apiaries
+                            </a>
+                            <h3 class="text-dark mb-0" id="apiaryName">Mountain View Apiary</h3>
+                            <p class="text-muted">
+                                <i class="fas fa-map-marker-alt location-pin me-1"></i>
+                                <span id="apiaryLocation">Meadow Hills, CA</span>
+                            </p>
+                        </div>
+                        <div>
+                            <button class="btn btn-outline-secondary me-2 action-button" id="editApiaryBtn">
+                                <i class="fas fa-edit"></i> Edit Apiary
+                            </button>
+                            <button class="btn btn-primary action-button" id="addHiveBtn">
+                                <i class="fas fa-plus"></i> Add Hive
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Apiary Metrics -->
+                    <div class="row mb-4">
+                        <!-- Temperature Metric -->
+                        <div class="col-md-3 mb-4">
+                            <div class="card shadow h-100 metric-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <i class="fas fa-temperature-high metric-icon text-danger"></i>
+                                        <div class="metric-label">Average Temperature</div>
+                                    </div>
+                                    <div class="d-flex align-items-baseline">
+                                        <div class="metric-value" id="avgTemperature">34.0</div>
+                                        <div class="unit">°C</div>
+                                        <div class="metric-trend trend-up" id="tempTrend">
+                                            <i class="fas fa-arrow-up"></i> 1.2°
+                                        </div>
+                                    </div>
+                                    <div class="progress mb-1 mt-2">
+                                        <div class="progress-bar progress-bar-temp" role="progressbar" style="width: 70%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Humidity Metric -->
+                        <div class="col-md-3 mb-4">
+                            <div class="card shadow h-100 metric-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <i class="fas fa-tint metric-icon text-primary"></i>
+                                        <div class="metric-label">Average Humidity</div>
+                                    </div>
+                                    <div class="d-flex align-items-baseline">
+                                        <div class="metric-value" id="avgHumidity">42</div>
+                                        <div class="unit">%</div>
+                                        <div class="metric-trend trend-stable" id="humidityTrend">
+                                            <i class="fas fa-minus"></i> 0.4%
+                                        </div>
+                                    </div>
+                                    <div class="progress mb-1 mt-2">
+                                        <div class="progress-bar progress-bar-humidity" role="progressbar" style="width: 42%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sound Level Metric -->
+                        <div class="col-md-3 mb-4">
+                            <div class="card shadow h-100 metric-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <i class="fas fa-volume-up metric-icon text-purple"></i>
+                                        <div class="metric-label">Average Sound Level</div>
+                                    </div>
+                                    <div class="d-flex align-items-baseline">
+                                        <div class="metric-value" id="avgSoundLevel">60</div>
+                                        <div class="unit">dB</div>
+                                        <div class="metric-trend trend-down" id="soundTrend">
+                                            <i class="fas fa-arrow-down"></i> 3.5dB
+                                        </div>
+                                    </div>
+                                    <div class="progress mb-1 mt-2">
+                                        <div class="progress-bar progress-bar-sound" role="progressbar" style="width: 60%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Weight Metric -->
+                        <div class="col-md-3 mb-4">
+                            <div class="card shadow h-100 metric-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <i class="fas fa-weight metric-icon text-warning"></i>
+                                        <div class="metric-label">Average Weight</div>
+                                    </div>
+                                    <div class="d-flex align-items-baseline">
+                                        <div class="metric-value" id="avgWeight">17.8</div>
+                                        <div class="unit">kg</div>
+                                        <div class="metric-trend trend-up" id="weightTrend">
+                                            <i class="fas fa-arrow-up"></i> 0.3kg
+                                        </div>
+                                    </div>
+                                    <div class="progress mb-1 mt-2">
+                                        <div class="progress-bar progress-bar-weight" role="progressbar" style="width: 65%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hives Section -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="text-dark">Hives in this Apiary</h4>
+                        <div id="lastUpdated" class="text-muted small">
+                            <i class="fas fa-sync-alt me-1"></i> Last updated: <span id="updateTime">Just now</span>
+                        </div>
+                    </div>
+
+                    <div class="row" id="hivesList">
+                        <!-- Loading placeholder -->
+                        <div class="col-12 text-center py-5" id="hivesLoading">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-3 text-muted">Loading hive data...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="bg-white sticky-footer">
+                <div class="container my-auto">
+                    <div class="text-center my-auto copyright"><span>Copyright © Smart Nyuki 2025</span></div>
+                </div>
+            </footer>
+        </div>
+        <a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="env.js"></script>
+    <script src="assets/js/script.min.js"></script>
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/sidebar-template.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <script src="assets/js/apiary-details.js"></script>
+</body>
+
+</html> 
