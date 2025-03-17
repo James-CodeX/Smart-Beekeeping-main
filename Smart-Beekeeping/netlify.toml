@@ -1,5 +1,6 @@
 [build]
-  publish = "dist"
+  base = "."
+  publish = "./dist"
   command = "npm run build"
 
 # Redirect all URLs to index.html for Single Page Applications
