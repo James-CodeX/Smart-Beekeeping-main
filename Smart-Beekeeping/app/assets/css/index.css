@@ -1,0 +1,54 @@
+/* CSS styles for index.html */
+
+/* Styling for charts */
+.chart-container {
+    position: relative;
+    min-height: 300px;
+    margin-bottom: 20px;
+}
+
+/* Styling for metrics cards */
+.metric-card {
+    border-left: 0.25rem solid;
+    border-radius: 0.35rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.metric-card.temperature {
+    border-left-color: #4e73df;
+}
+
+.metric-card.humidity {
+    border-left-color: #1cc88a;
+}
+
+.metric-card.weight {
+    border-left-color: #36b9cc;
+}
+
+.metric-card.sound {
+    border-left-color: #f6c23e;
+}
+
+/* Health indicators styling */
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+/* Dashboard specific styles */
+.dashboard-card {
+    margin-bottom: 20px;
+}
+
+.status-indicator {
+    min-height: 80px;
+}
+
+.icon-circle {
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+} 

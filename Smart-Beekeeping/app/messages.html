@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Messages - Smart Nyuki</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/fonts/fontawesome-all.min.css">
+    <link rel="stylesheet" href="assets/css/styles.min.css">
+    <link rel="stylesheet" href="assets/css/messages.css">
+</head>
+
+<body id="page-top">
+    <div id="wrapper">
+        <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
+            <div class="container-fluid d-flex flex-column p-0">
+                <a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#">
+                    <div class="sidebar-brand-icon rotate-n-15"><i class="fas fa-bee"></i></div>
+                    <div class="sidebar-brand-text mx-3"><span>Smart Nyuki</span></div>
+                </a>
+                <hr class="sidebar-divider my-0">
+                <ul class="navbar-nav text-light" id="accordionSidebar">
+                    <li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="table.html"><i class="fas fa-table"></i><span>Table</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="manage-my-bees.html"><i class="fas fa-map-marker-alt"></i><span>Manage My Bees</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="add-hive.html"><i class="fas fa-plus-circle"></i><span>Add Hive</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="alerts.html"><i class="fas fa-bell"></i><span>Alerts</span></a></li>
+                    <li class="nav-item"><a class="nav-link active" href="messages.html"><i class="fas fa-envelope"></i><span>Messages</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="profile.html"><i class="fas fa-user"></i><span>Profile</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
+                </ul>
+                <div class="text-center d-none d-md-inline">
+                    <button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button>
+                </div>
+            </div>
+        </nav>
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+                <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
+                    <div class="container-fluid">
+                        <button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <ul class="navbar-nav flex-nowrap ms-auto">
+                            <li class="nav-item dropdown no-arrow">
+                                <div class="nav-item dropdown no-arrow">
+                                    <a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#">
+                                        <span class="d-none d-lg-inline me-2 text-gray-600 small" id="userEmail"></span>
+                                        <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>
+                                    </a>
+                                    <div class="dropdown-menu shadow dropdown-menu-end animated--grow-in">
+                                        <a class="dropdown-item" href="profile.html">
+                                            <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Profile
+                                        </a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#" onclick="handleLogout()">
+                                            <i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Logout
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="text-dark mb-0">Messages Center</h3>
+                        <div>
+                            <button class="btn btn-primary me-2" onclick="markAllAsRead()">
+                                <i class="fas fa-check-double me-1"></i> Mark All as Read
+                            </button>
+                            <button class="btn btn-danger" onclick="clearAllMessages()">
+                                <i class="fas fa-trash me-1"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card shadow">
+                        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="text-primary fw-bold m-0">Messages</h6>
+                            <div>
+                                <span class="badge bg-danger me-2" id="totalUnreadMessages">0 Unread</span>
+                                <span class="badge bg-secondary" id="totalMessages">0 Total</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-3 mb-2">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-filter"></i></span>
+                                        <select class="form-select" id="messageTypeFilter">
+                                            <option value="all">All Types</option>
+                                            <option value="system">System</option>
+                                            <option value="notification">Notification</option>
+                                            <option value="update">Update</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-exclamation-circle"></i></span>
+                                        <select class="form-select" id="priorityFilter">
+                                            <option value="all">All Priorities</option>
+                                            <option value="high">High</option>
+                                            <option value="medium">Medium</option>
+                                            <option value="low">Low</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                        <select class="form-select" id="dateFilter">
+                                            <option value="all">All Time</option>
+                                            <option value="today">Today</option>
+                                            <option value="week">This Week</option>
+                                            <option value="month">This Month</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-eye"></i></span>
+                                        <select class="form-select" id="statusFilter">
+                                            <option value="all">All Status</option>
+                                            <option value="unread">Unread</option>
+                                            <option value="read">Read</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="messagesList" class="message-list">
+                                <!-- Messages will be loaded here -->
+                            </div>
+                            <div id="noMessages" class="text-center p-5" style="display: none;">
+                                <i class="fas fa-envelope-open fa-4x text-gray-300 mb-3"></i>
+                                <h4 class="text-gray-500 mb-2">No Messages</h4>
+                                <p class="text-gray-500 mb-0">Your inbox is empty. New messages will appear here.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="bg-white sticky-footer">
+                <div class="container my-auto">
+                    <div class="text-center my-auto copyright">
+                        <span>Copyright © Smart Nyuki 2024</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/script.min.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/data-manager.js"></script>
+    <script src="assets/js/messages.js"></script>
+</body>
+
+</html> 

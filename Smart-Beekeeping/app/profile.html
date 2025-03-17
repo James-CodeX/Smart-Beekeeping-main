@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Profile - Smart Nyuki</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="assets/css/styles.min.css">
+    <link rel="stylesheet" href="assets/css/smart-nyuki-theme.css">
+    <link rel="stylesheet" href="assets/css/profile.css">
+</head>
+
+<body id="page-top">
+    <div id="wrapper">
+        <nav class="navbar align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0 navbar-dark">
+            <div class="container-fluid d-flex flex-column p-0">
+                <a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#">
+                    <div class="sidebar-brand-icon rotate-n-15"><i class="fas fa-bee"></i></div>
+                    <div class="sidebar-brand-text mx-3"><span>Smart Nyuki</span></div>
+                </a>
+                <hr class="sidebar-divider my-0">
+                <ul class="navbar-nav text-light" id="accordionSidebar">
+                    <li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                    <li class="nav-item"></li>
+                    <li class="nav-item"><a class="nav-link" href="table.html"><i class="fas fa-table"></i><span>Table</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="manage-my-bees.html"><i class="fas fa-map-marker-alt"></i><span>Manage My Bees</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="add-hive.html"><i class="fas fa-plus-circle"></i><span>Add Hive</span></a></li>
+                    <li class="nav-item"><a class="nav-link active" href="profile.html"><i class="fas fa-user"></i><span>Profile</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
+                </ul>
+                <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
+            </div>
+        </nav>
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+                <nav class="navbar navbar-expand bg-white shadow mb-4 topbar">
+                    <div class="container-fluid">
+                        <button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button>
+                        <ul class="navbar-nav flex-nowrap ms-auto">
+                            <div class="d-none d-sm-block topbar-divider"></div>
+                            <li class="nav-item dropdown no-arrow">
+                                <div class="nav-item dropdown no-arrow">
+                                    <a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#">
+                                        <span class="d-none d-lg-inline me-2 text-gray-600 small">Loading...</span>
+                                        <img class="border rounded-circle img-profile" src="https://ui-avatars.com/api/?background=0D8ABC&color=fff" alt="Profile">
+                                    </a>
+                                    <div class="dropdown-menu shadow dropdown-menu-end animated--grow-in">
+                                        <a class="dropdown-item" href="profile.html">
+                                            <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>Profile
+                                        </a>
+                                        <a class="dropdown-item" href="#">
+                                            <i class="fas fa-cogs fa-sm fa-fw me-2 text-gray-400"></i>Settings
+                                        </a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#" onclick="handleLogout()">
+                                            <i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>Logout
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                <div class="container-fluid">
+                    <h3 class="text-dark mb-4">Profile</h3>
+                    <div class="row mb-3">
+                        <div class="col-lg-4">
+                            <div class="card mb-3">
+                                <div class="card-body text-center shadow">
+                                    <img class="rounded-circle mb-3 mt-4" id="profile-image" src="https://ui-avatars.com/api/?background=0D8ABC&color=fff" width="160" height="160">
+                                    <div class="mb-3">
+                                        <input type="file" id="photo-upload" accept="image/*" style="display: none;">
+                                        <button class="btn btn-primary btn-sm" type="button" onclick="document.getElementById('photo-upload').click()">Change Photo</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="text-primary fw-bold m-0">Profile Status</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Account Type:</strong> <span class="badge bg-primary">Standard User</span></p>
+                                    <p><strong>Member Since:</strong> <span id="member-since">Loading...</span></p>
+                                    <p><strong>Last Login:</strong> <span id="last-login">Loading...</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="card shadow mb-3">
+                                        <div class="card-header py-3">
+                                            <p class="text-primary m-0 fw-bold">User Information</p>
+                                        </div>
+                                        <div class="card-body">
+                                            <form id="profile-form">
+                                                <div class="row">
+                                                    <div class="col-sm-12 col-md-6">
+                                                        <div class="mb-3">
+                                                            <label class="form-label" for="display_name"><strong>Display Name</strong></label>
+                                                            <input class="form-control" type="text" id="display_name" name="display_name" placeholder="Display Name">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-6">
+                                                        <div class="mb-3">
+                                                            <label class="form-label" for="email"><strong>Email Address</strong></label>
+                                                            <input class="form-control" type="email" id="email" name="email" readonly>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-12 col-md-6">
+                                                        <div class="mb-3">
+                                                            <label class="form-label" for="phone"><strong>Phone Number</strong></label>
+                                                            <input class="form-control" type="tel" id="phone" name="phone" placeholder="Phone Number">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-6">
+                                                        <div class="mb-3">
+                                                            <label class="form-label" for="created_at"><strong>Member Since</strong></label>
+                                                            <input class="form-control" type="text" id="created_at" name="created_at" readonly>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <button class="btn btn-primary" type="submit">Save Changes</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="card shadow">
+                                        <div class="card-header py-3">
+                                            <p class="text-primary m-0 fw-bold">Change Password</p>
+                                        </div>
+                                        <div class="card-body">
+                                            <form id="password-form">
+                                                <div class="mb-3">
+                                                    <label class="form-label" for="current-password"><strong>Current Password</strong></label>
+                                                    <input class="form-control" type="password" id="current-password" name="current_password" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label" for="new-password"><strong>New Password</strong></label>
+                                                    <input class="form-control" type="password" id="new-password" name="new_password" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label" for="confirm-password"><strong>Confirm Password</strong></label>
+                                                    <input class="form-control" type="password" id="confirm-password" name="confirm_password" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <button class="btn btn-primary" type="submit">Change Password</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="bg-white sticky-footer">
+                <div class="container my-auto">
+                    <div class="text-center my-auto copyright"><span>Copyright © Smart Nyuki 2025</span></div>
+                </div>
+            </footer>
+        </div>
+        <a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="assets/js/script.min.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/profile.js"></script>
+</body>
+
+</html>

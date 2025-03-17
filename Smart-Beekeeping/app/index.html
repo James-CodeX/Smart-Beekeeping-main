@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Dashboard - Brand</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="assets/css/styles.min.css">
+    <link rel="stylesheet" href="assets/css/smart-nyuki-theme.css">
+    <link rel="stylesheet" href="assets/css/index.css">
+</head>
+
+<body id="page-top">
+    <div id="wrapper">
+        <nav class="navbar align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0 navbar-dark">
+            <div class="container-fluid d-flex flex-column p-0">
+                <a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#">
+                    <div class="sidebar-brand-icon rotate-n-15"><i class="fas fa-bee"></i></div>
+                    <div class="sidebar-brand-text mx-3"><span>Smart Nyuki</span></div>
+                </a>
+                <hr class="sidebar-divider my-0">
+                <ul class="navbar-nav text-light" id="accordionSidebar">
+                    <li class="nav-item"><a class="nav-link active" href="index.html"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                    <li class="nav-item"></li>
+                    <li class="nav-item"><a class="nav-link" href="table.html"><i class="fas fa-table"></i><span>Table</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="manage-my-bees.html"><i class="fas fa-map-marker-alt"></i><span>Manage My Bees</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="add-hive.html"><i class="fas fa-plus-circle"></i><span>Add Hive</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="alerts.html"><i class="fas fa-bell"></i><span>Alerts</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="messages.html"><i class="fas fa-envelope"></i><span>Messages</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="profile.html"><i class="fas fa-user"></i><span>Profile</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
+                </ul>
+                <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
+            </div>
+        </nav>
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+                <nav class="navbar navbar-expand bg-white shadow mb-4 topbar static-top navbar-light">
+                    <div class="container-fluid">
+                        <button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <form class="d-none d-sm-inline-block me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            <div class="input-group"><input class="bg-light form-control border-0 small" type="text" placeholder="Search for ..."><button class="btn btn-primary py-0" type="button"><i class="fas fa-search"></i></button></div>
+                        </form>
+                        <ul class="navbar-nav flex-nowrap ms-auto">
+                            <li class="nav-item dropdown d-sm-none no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><i class="fas fa-search"></i></a>
+                                <div class="dropdown-menu dropdown-menu-end p-3 animated--grow-in" aria-labelledby="searchDropdown">
+                                    <form class="me-auto navbar-search w-100">
+                                        <div class="input-group"><input class="bg-light border-0 form-control small" type="text" placeholder="Search for ..."><button class="btn btn-primary" type="button"><i class="fas fa-search"></i></button></div>
+                                    </form>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown no-arrow mx-1">
+                                <div class="nav-item dropdown no-arrow">
+                                    <a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#">
+                                        <span class="badge bg-danger badge-counter" id="alertsCount"></span>
+                                        <i class="fas fa-bell fa-fw"></i>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-end dropdown-list animated--grow-in">
+                                        <h6 class="dropdown-header">Alerts Center</h6>
+                                        <div id="alertsDropdown">
+                                            <!-- Latest alerts will be loaded here -->
+                                        </div>
+                                        <a class="dropdown-item text-center small text-gray-500" href="alerts.html">Show All Alerts</a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown no-arrow mx-1">
+                                <div class="nav-item dropdown no-arrow">
+                                    <a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#">
+                                        <span class="badge bg-danger badge-counter" id="messagesCount"></span>
+                                        <i class="fas fa-envelope fa-fw"></i>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-end dropdown-list animated--grow-in">
+                                        <h6 class="dropdown-header">Messages Center</h6>
+                                        <div id="messagesDropdown">
+                                            <!-- Latest messages will be loaded here -->
+                                        </div>
+                                        <a class="dropdown-item text-center small text-gray-500" href="messages.html">Show All Messages</a>
+                                    </div>
+                                </div>
+                            </li>
+                            <div class="d-none d-sm-block topbar-divider"></div>
+                            <li class="nav-item dropdown no-arrow">
+                                <div class="nav-item dropdown no-arrow">
+                                    <a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#">
+                                        <span class="d-none d-lg-inline me-2 text-gray-600 small">Loading...</span>
+                                        <img class="border rounded-circle img-profile" src="https://ui-avatars.com/api/?background=0D8ABC&color=fff" alt="Profile">
+                                    </a>
+                                    <div class="dropdown-menu shadow dropdown-menu-end animated--grow-in">
+                                        <a class="dropdown-item" href="profile.html">
+                                            <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>Profile
+                                        </a>
+                                        <a class="dropdown-item" href="#">
+                                            <i class="fas fa-cogs fa-sm fa-fw me-2 text-gray-400"></i>Settings
+                                        </a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#" onclick="handleLogout()">
+                                            <i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>Logout
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                <div class="container-fluid">
+                    <div class="d-sm-flex justify-content-between align-items-center mb-4">
+                        <h3 class="text-dark mb-0">Hive Monitoring Dashboard</h3>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-xl-3 mb-4">
+                            <div class="card shadow border-left-primary py-2">
+                                <div class="card-body">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col me-2">
+                                            <div class="text-uppercase text-primary fw-bold text-xs mb-1">
+                                                <span>Temperature</span>
+                                            </div>
+                                            <div class="text-dark fw-bold h5 mb-0">
+                                                <span id="temperature">35.2°C</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-temperature-high fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-xl-3 mb-4">
+                            <div class="card shadow border-left-success py-2">
+                                <div class="card-body">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col me-2">
+                                            <div class="text-uppercase text-success fw-bold text-xs mb-1">
+                                                <span>Humidity</span>
+                                            </div>
+                                            <div class="text-dark fw-bold h5 mb-0">
+                                                <span id="humidity">65%</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-tint fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-xl-3 mb-4">
+                            <div class="card shadow border-left-info py-2">
+                                <div class="card-body">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col me-2">
+                                            <div class="text-uppercase text-info fw-bold text-xs mb-1">
+                                                <span>Weight</span>
+                                            </div>
+                                            <div class="text-dark fw-bold h5 mb-0">
+                                                <span id="weight">25.5 kg</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-weight fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-xl-3 mb-4">
+                            <div class="card shadow border-left-warning py-2">
+                                <div class="card-body">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col me-2">
+                                            <div class="text-uppercase text-warning fw-bold text-xs mb-1">
+                                                <span>Sound Level</span>
+                                            </div>
+                                            <div class="text-dark fw-bold h5 mb-0">
+                                                <span id="sound">45 dB</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-volume-up fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-7 col-xl-8">
+                            <div class="card shadow mb-4">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h6 class="text-primary fw-bold m-0">24-Hour Metrics Overview</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-area">
+                                        <canvas id="metricsChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Individual Metric Charts -->
+                            <div class="row">
+                                <div class="col-xl-6 mb-4">
+                                    <div class="card shadow">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h6 class="text-primary fw-bold m-0">Temperature Trend</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="chart-area">
+                                                <canvas id="temperatureChart"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 mb-4">
+                                    <div class="card shadow">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h6 class="text-success fw-bold m-0">Humidity Trend</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="chart-area">
+                                                <canvas id="humidityChart"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xl-6 mb-4">
+                                    <div class="card shadow">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h6 class="text-info fw-bold m-0">Weight Trend</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="chart-area">
+                                                <canvas id="weightChart"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 mb-4">
+                                    <div class="card shadow">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h6 class="text-warning fw-bold m-0">Sound Level Trend</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="chart-area">
+                                                <canvas id="soundChart"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-5 col-xl-4">
+                            <div class="card shadow mb-4">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h6 class="text-primary fw-bold m-0">Alert Thresholds</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="alert alert-primary mb-2">
+                                        <strong>Temperature:</strong>
+                                        <br>Min: 32°C | Max: 37°C
+                                        <div class="small text-gray-500">Current: <span id="temperature-status">Normal</span></div>
+                                    </div>
+                                    <div class="alert alert-success mb-2">
+                                        <strong>Humidity:</strong>
+                                        <br>Min: 50% | Max: 75%
+                                        <div class="small text-gray-500">Current: <span id="humidity-status">Normal</span></div>
+                                    </div>
+                                    <div class="alert alert-info mb-2">
+                                        <strong>Weight:</strong>
+                                        <br>Min: 1.2kg | Max: 1.6kg
+                                        <div class="small text-gray-500">Current: <span id="weight-status">Normal</span></div>
+                                    </div>
+                                    <div class="alert alert-warning mb-2">
+                                        <strong>Sound Level:</strong>
+                                        <br>Min: 30dB | Max: 60dB
+                                        <div class="small text-gray-500">Current: <span id="sound-status">Normal</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 mb-4">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="text-primary fw-bold m-0">Hive Health Indicators</h6>
+                                </div>
+                                <div class="card-body">
+                                    <h4 class="small fw-bold">Temperature Stability<span class="float-end" id="temp-stability">90%</span></h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar bg-success" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" style="width: 90%;"><span class="visually-hidden">90%</span></div>
+                                    </div>
+                                    <h4 class="small fw-bold">Humidity Balance<span class="float-end" id="humidity-balance">80%</span></h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar bg-info" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 80%;"><span class="visually-hidden">80%</span></div>
+                                    </div>
+                                    <h4 class="small fw-bold">Colony Activity<span class="float-end" id="colony-activity">75%</span></h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar bg-primary" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%;"><span class="visually-hidden">75%</span></div>
+                                    </div>
+                                    <h4 class="small fw-bold">Honey Production<span class="float-end" id="honey-production">70%</span></h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar bg-warning" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width: 70%;"><span class="visually-hidden">70%</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="text-primary fw-bold m-0">Status Indicators</h6>
+                                </div>
+                                <div class="row p-3">
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card text-white bg-primary shadow">
+                                            <div class="card-body">
+                                                <p class="m-0">Temperature Status</p>
+                                                <p class="text-white-50 small m-0" id="temperature-indicator">Optimal Range</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card text-white bg-success shadow">
+                                            <div class="card-body">
+                                                <p class="m-0">Humidity Status</p>
+                                                <p class="text-white-50 small m-0" id="humidity-indicator">Normal Levels</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card text-white bg-info shadow">
+                                            <div class="card-body">
+                                                <p class="m-0">Weight Status</p>
+                                                <p class="text-white-50 small m-0" id="weight-indicator">Healthy Growth</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card text-white bg-warning shadow">
+                                            <div class="card-body">
+                                                <p class="m-0">Sound Status</p>
+                                                <p class="text-white-50 small m-0" id="sound-indicator">Normal Activity</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="bg-white sticky-footer">
+                <div class="container my-auto">
+                    <div class="text-center my-auto copyright"><span>Copyright © Smart Nyuki 2025</span></div>
+                </div>
+            </footer>
+        </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="assets/js/script.min.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/data-manager.js"></script>
+    <script src="assets/js/index.js"></script>
+</body>
+
+</html>

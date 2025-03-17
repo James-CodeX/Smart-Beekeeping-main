@@ -1,0 +1,65 @@
+/* CSS styles for messages.html */
+
+.icon-circle {
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-danger {
+    background-color: #e74a3b !important;
+}
+
+.bg-warning {
+    background-color: #f6c23e !important;
+}
+
+.bg-info {
+    background-color: #36b9cc !important;
+}
+
+.message-card {
+    border-left: 0.25rem solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.message-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.message-card.unread {
+    border-left-color: #4e73df;
+}
+
+.message-card.high-priority {
+    border-left-color: #e74a3b;
+}
+
+.message-card.medium-priority {
+    border-left-color: #f6c23e;
+}
+
+.filter-container {
+    background-color: #f8f9fc;
+    border-radius: 0.35rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.message-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#noMessages {
+    padding: 2rem;
+    text-align: center;
+    background-color: #f8f9fc;
+    border-radius: 0.35rem;
+    margin-top: 1rem;
+} 

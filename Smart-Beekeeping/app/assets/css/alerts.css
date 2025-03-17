@@ -1,0 +1,100 @@
+/* CSS styles for alerts.html */
+
+/* Alert card styling */
+.alert {
+    border-radius: 0.35rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.10);
+    border: 1px solid transparent;
+    margin-bottom: 1rem;
+}
+
+.icon-circle {
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Alert types */
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+
+.alert-info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+/* Filter section styling */
+.filter-container {
+    background-color: #f8f9fc;
+    padding: 1rem;
+    border-radius: 0.35rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e3e6f0;
+}
+
+.form-select:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+/* Alert actions */
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+}
+
+.btn-outline-secondary {
+    color: #858796;
+    border-color: #858796;
+}
+
+.btn-outline-secondary:hover {
+    color: #fff;
+    background-color: #858796;
+}
+
+.btn-outline-danger {
+    color: #e74a3b;
+    border-color: #e74a3b;
+}
+
+.btn-outline-danger:hover {
+    color: #fff;
+    background-color: #e74a3b;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    background-color: #f8f9fc;
+    border-radius: 0.35rem;
+    border: 1px solid #e3e6f0;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: #d1d3e2;
+    margin-bottom: 1rem;
+} 

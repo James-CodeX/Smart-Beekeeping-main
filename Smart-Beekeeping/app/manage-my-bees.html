@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Manage My Bees - Smart Nyuki</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="assets/css/styles.min.css">
+    <link rel="stylesheet" href="assets/css/smart-nyuki-theme.css">
+</head>
+
+<body id="page-top">
+    <div id="wrapper">
+        <nav class="navbar align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0 navbar-dark">
+            <div class="container-fluid d-flex flex-column p-0">
+                <a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#">
+                    <div class="sidebar-brand-icon rotate-n-15"><i class="fas fa-bee"></i></div>
+                    <div class="sidebar-brand-text mx-3"><span>Smart Nyuki</span></div>
+                </a>
+                <hr class="sidebar-divider my-0">
+                <ul class="navbar-nav text-light" id="accordionSidebar">
+                    <li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                    <li class="nav-item"></li>
+                    <li class="nav-item"><a class="nav-link" href="table.html"><i class="fas fa-table"></i><span>Table</span></a></li>
+                    <li class="nav-item"><a class="nav-link active" href="manage-my-bees.html"><i class="fas fa-map-marker-alt"></i><span>Manage My Bees</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="add-hive.html"><i class="fas fa-plus-circle"></i><span>Add Hive</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="profile.html"><i class="fas fa-user"></i><span>Profile</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
+                </ul>
+                <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
+            </div>
+        </nav>
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+                <nav class="navbar navbar-expand bg-white shadow mb-4 topbar static-top navbar-light">
+                    <div class="container-fluid">
+                        <button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <ul class="navbar-nav flex-nowrap ms-auto">
+                            <div class="d-none d-sm-block topbar-divider"></div>
+                            <li class="nav-item dropdown no-arrow">
+                                <div class="nav-item dropdown no-arrow">
+                                    <a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#">
+                                        <span class="d-none d-lg-inline me-2 text-gray-600 small">Loading...</span>
+                                        <img class="border rounded-circle img-profile" src="https://ui-avatars.com/api/?background=0D8ABC&color=fff" alt="Profile">
+                                    </a>
+                                    <div class="dropdown-menu shadow dropdown-menu-end animated--grow-in">
+                                        <a class="dropdown-item" href="profile.html">
+                                            <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>Profile
+                                        </a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#" onclick="handleLogout()">
+                                            <i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>Logout
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                <div class="container-fluid">
+                    <!-- Apiaries View -->
+                    <div id="apiariesView">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="text-dark">Manage My Bees</h3>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addApiaryModal">
+                                <i class="fas fa-plus"></i> Add New Apiary
+                            </button>
+                        </div>
+
+                        <!-- Apiaries List -->
+                        <div class="row" id="apiariesList">
+                            <!-- Apiaries will be loaded here dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Apiary Details View -->
+                    <div id="apiaryDetailsView" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <button class="btn btn-outline-primary mb-2" onclick="goBackToApiaries()">
+                                    <i class="fas fa-arrow-left"></i> Back to Apiaries
+                                </button>
+                                <h3 class="text-dark" id="apiaryDetailsTitle">Apiary Details</h3>
+                            </div>
+                            <a href="add-hive.html" class="btn btn-primary" id="addHiveBtn">
+                                <i class="fas fa-plus"></i> Add New Hive
+                            </a>
+                        </div>
+
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Apiary Information</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Location:</strong> <span id="apiaryDetailsLocation"></span></p>
+                                        <p><strong>Created:</strong> <span id="apiaryDetailsCreated"></span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Notes:</strong> <span id="apiaryDetailsNotes"></span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4 class="text-dark mb-3">Hives</h4>
+                        <div class="row" id="hivesList">
+                            <!-- Hives will be loaded here dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Add Apiary Modal -->
+                    <div class="modal fade" id="addApiaryModal" tabindex="-1" aria-labelledby="addApiaryModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="addApiaryModalLabel">Add New Apiary</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form id="addApiaryForm" onsubmit="handleAddApiary(event)">
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label" for="apiaryName"><strong>Apiary Name</strong> <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" id="apiaryName" name="apiaryName" placeholder="Enter Apiary Name" required>
+                                            <small class="text-muted">Give your apiary a unique, descriptive name</small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="apiaryLocation"><strong>Location</strong> <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" id="apiaryLocation" name="apiaryLocation" placeholder="Enter Location" required>
+                                            <small class="text-muted">Physical location of the apiary</small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="apiaryNotes"><strong>Notes</strong></label>
+                                            <textarea class="form-control" id="apiaryNotes" name="apiaryNotes" rows="3" placeholder="Enter any additional notes about the apiary"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Add Apiary</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- View Hives Modal -->
+                    <div class="modal fade" id="viewHivesModal" tabindex="-1" aria-labelledby="viewHivesModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="viewHivesModalLabel">Hives in Apiary</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Node ID</th>
+                                                    <th>Location</th>
+                                                    <th>Type</th>
+                                                    <th>Installed</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="hivesTableBody">
+                                                <!-- Hives will be loaded here dynamically -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" onclick="addHiveToCurrentApiary()">Add New Hive</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="bg-white sticky-footer">
+                <div class="container my-auto">
+                    <div class="text-center my-auto copyright"><span>Copyright © Smart Nyuki 2025</span></div>
+                </div>
+            </footer>
+        </div>
+        <a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="assets/js/script.min.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/manage-my-bees.js"></script>
+</body>
+
+</html> 

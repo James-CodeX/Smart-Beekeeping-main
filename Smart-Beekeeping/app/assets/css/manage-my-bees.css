@@ -1,0 +1,27 @@
+/* CSS styles for manage-my-bees.html */
+
+.apiary-card {
+    transition: transform 0.2s;
+    height: 100%;
+}
+
+.apiary-card:hover {
+    transform: translateY(-5px);
+}
+
+.card {
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    border: none;
+    border-radius: 0.35rem;
+}
+
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.map-container {
+    height: 400px;
+    border-radius: 0.35rem;
+    overflow: hidden;
+} 

@@ -1,0 +1,27 @@
+/* CSS styles for table.html */
+
+/* Table-specific styles */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.table th {
+    font-weight: 600;
+    background-color: #f8f9fc;
+}
+
+.pagination-info {
+    color: #858796;
+    font-size: 0.875rem;
+}
+
+/* Adjust card for the data table */
+.card-table {
+    margin-bottom: 20px;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+} 
