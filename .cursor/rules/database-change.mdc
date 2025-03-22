@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+incase you make any change that involves change in the database, always also make the it known that changes in the databse are required

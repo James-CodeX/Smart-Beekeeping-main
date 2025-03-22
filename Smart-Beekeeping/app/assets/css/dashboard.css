@@ -11,7 +11,7 @@
   }
 }
 
-/* Fix status cards */
+/* Status cards */
 .border-left-primary {
   border-left: 0.25rem solid #4e73df !important;
 }
@@ -28,7 +28,7 @@
   border-left: 0.25rem solid #f6c23e !important;
 }
 
-/* Ensure status cards look good on all screen sizes */
+/* Card body padding */
 .card-body {
   padding: 1.25rem;
 }
@@ -38,7 +38,7 @@
   margin-bottom: 0 !important;
 }
 
-/* Fix for scroll to top button */
+/* Scroll to top button */
 .scroll-to-top {
   position: fixed;
   right: 1rem;

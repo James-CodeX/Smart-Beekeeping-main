@@ -33,3 +33,6 @@ bower_components/
 Thumbs.db
 ehthumbs.db
 Desktop.ini 
+
+# Cursor files
+.cursor/
