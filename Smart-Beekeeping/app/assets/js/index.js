@@ -3,9 +3,186 @@
 // Global variables
 let metricsChart, temperatureChart, humidityChart, weightChart, soundChart;
 let currentHiveSubscription = null;
+let loadingDataRetryCount = 0;
+
+// Add a more robust loader function at the top
+async function forceLoadDropdowns() {
+    console.log("FORCE LOADING DROPDOWNS");
+    
+    try {
+        // Verify Supabase is available
+        if (!window.supabase) {
+            console.error("Supabase not initialized, retrying initialization");
+            await initializeSupabaseWithRetry(5);
+        }
+        
+        // Get user session
+        const { data: { session }, error: sessionError } = await window.supabase.auth.getSession();
+        if (sessionError) {
+            console.error("Session error:", sessionError);
+            return;
+        }
+        
+        if (!session) {
+            console.warn("No session found");
+            return;
+        }
+        
+        const userId = session.user.id;
+        console.log("FORCE LOADING: User ID:", userId);
+        
+        // Directly fetch apiaries
+        const { data: apiaries, error: apiaryError } = await window.supabase
+            .from('apiaries')
+            .select('*')
+            .eq('user_id', userId);
+            
+        if (apiaryError) {
+            console.error("Error fetching apiaries:", apiaryError);
+            return;
+        }
+        
+        console.log("FORCE LOADING: Apiaries found:", apiaries ? apiaries.length : 0);
+        
+        // Get selector element
+        const apiarySelector = document.getElementById('apiarySelector');
+        if (!apiarySelector) {
+            console.error("Apiary selector not found");
+            return;
+        }
+        
+        // Clear and populate selector
+        apiarySelector.innerHTML = '<option value="" disabled selected>Select an apiary...</option>';
+        
+        if (apiaries && apiaries.length > 0) {
+            apiaries.forEach(apiary => {
+                const option = document.createElement('option');
+                option.value = apiary.id;
+                option.textContent = apiary.name || `Apiary #${apiary.id}`;
+                apiarySelector.appendChild(option);
+            });
+            
+            // Enable selector
+            apiarySelector.disabled = false;
+            
+            // Select first apiary
+            apiarySelector.value = apiaries[0].id;
+            
+            // Now load hives for this apiary
+            const { data: hives, error: hivesError } = await window.supabase
+                .from('hive_details')
+                .select('*')
+                .eq('apiary_id', apiaries[0].id);
+                
+            if (hivesError) {
+                console.error("Error fetching hives:", hivesError);
+                return;
+            }
+            
+            console.log("FORCE LOADING: Hives found:", hives ? hives.length : 0);
+            
+            const hiveSelector = document.getElementById('hiveSelector');
+            if (!hiveSelector) {
+                console.error("Hive selector not found");
+                return;
+            }
+            
+            // Clear and populate hive selector
+            hiveSelector.innerHTML = '<option value="" disabled selected>Select a hive...</option>';
+            
+            if (hives && hives.length > 0) {
+                hives.forEach(hive => {
+                    const option = document.createElement('option');
+                    option.value = hive.node_id || hive.id;
+                    option.textContent = hive.hive_name || `Hive #${hive.node_id || hive.id}`;
+                    hiveSelector.appendChild(option);
+                });
+                
+                // Enable selector
+                hiveSelector.disabled = false;
+                
+                // Select first hive
+                hiveSelector.value = hives[0].node_id || hives[0].id;
+            } else {
+                hiveSelector.innerHTML = '<option value="" disabled selected>No hives found</option>';
+                hiveSelector.disabled = true;
+            }
+            
+            // Set up event listeners again
+            apiarySelector.removeEventListener('change', handleApiaryChange);
+            apiarySelector.addEventListener('change', handleApiaryChange);
+            
+            hiveSelector.removeEventListener('change', handleHiveChange);  
+            hiveSelector.addEventListener('change', handleHiveChange);
+            
+            // Manually trigger change events to load data
+            if (hives && hives.length > 0) {
+                const hiveEvent = new Event('change');
+                hiveSelector.dispatchEvent(hiveEvent);
+            }
+        } else {
+            apiarySelector.innerHTML = '<option value="" disabled selected>No apiaries found</option>';
+            apiarySelector.disabled = true;
+        }
+    } catch (error) {
+        console.error("Force loading error:", error);
+    }
+}
+
+// Make the function globally accessible
+window.forceLoadDropdowns = forceLoadDropdowns;
+
+// Add a selector rescue function
+function rescueSelectors() {
+    console.log('Running selector rescue function');
+    
+    // Get references to selectors
+    const apiarySelector = document.getElementById('apiarySelector');
+    const hiveSelector = document.getElementById('hiveSelector');
+    
+    if (!apiarySelector || !hiveSelector) {
+        console.error('Selectors not found in DOM');
+        return;
+    }
+    
+    // Force selectors to be visible and properly styled
+    apiarySelector.style.display = 'inline-block';
+    apiarySelector.style.visibility = 'visible';
+    apiarySelector.style.width = 'auto';
+    apiarySelector.style.minWidth = '120px';
+    
+    // Ensure events are properly bound
+    apiarySelector.removeEventListener('change', handleApiaryChange);
+    apiarySelector.addEventListener('change', handleApiaryChange);
+    
+    hiveSelector.removeEventListener('change', handleHiveChange);
+    hiveSelector.addEventListener('change', handleHiveChange);
+    
+    // Try to load data again if selectors are empty
+    if (apiarySelector.options.length <= 1) {
+        console.log('Apiary selector empty, trying to reload data');
+        loadApiarySelector().then(() => {
+            console.log('Apiary selector reloaded');
+        });
+    } else if (apiarySelector.value && hiveSelector.options.length <= 1) {
+        console.log('Hive selector empty, trying to reload data');
+        loadHiveSelector(apiarySelector.value).then(() => {
+            console.log('Hive selector reloaded');
+        });
+    }
+}
 
 // Initialize dashboard
 async function initializeDashboard() {
+    // Use the new force loader first
+    await forceLoadDropdowns();
+    
+    // If that didn't work, run the rescue after a delay
+    setTimeout(rescueSelectors, 1000);
+    
+    // Continue with normal initialization
+    console.log('Initializing dashboard...');
+    
     try {
         // Initialize Supabase
         await window.initializeSupabase();
@@ -41,42 +218,83 @@ async function initializeDashboard() {
     }
 }
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', async function() {
-    console.log('DOM fully loaded, initializing dashboard...');
+// Add database verification function at the top
+async function verifyDatabaseConnection() {
+    console.log('Verifying database connection...');
     
     try {
-        // Initialize alert container
-        const alertsContainer = document.createElement('div');
-        alertsContainer.id = 'alerts-container';
-        alertsContainer.className = 'position-fixed top-0 end-0 p-3';
-        alertsContainer.style.zIndex = '1050';
-        document.body.appendChild(alertsContainer);
-        
-        // Set up sidebar toggle
-        setupSidebarToggle();
-        
-        // Explicitly initialize Supabase with retries
-        await initializeSupabaseWithRetry();
-        
-        // Load selectors after confirming Supabase is ready
-        if (window.supabase) {
-            console.log('Supabase initialized successfully, loading apiaries...');
-            await loadApiarySelector();
-        } else {
-            console.error('Supabase not available after initialization attempts');
+        // Ensure Supabase is initialized
+        if (!window.supabase) {
+            console.error('Supabase not initialized, attempting initialization');
+            await initializeSupabaseWithRetry(5);
         }
         
-        // Set up event listeners
-        setupEventListeners();
+        // Check session
+        const { data: { session }, error: sessionError } = await window.supabase.auth.getSession();
+        if (sessionError) {
+            console.error('Session error:', sessionError);
+            return false;
+        }
         
-        // Set up logout handler
-        setupLogoutHandler();
+        if (!session) {
+            console.warn('No active session');
+            return false;
+        }
         
-        console.log('Dashboard initialization complete');
+        console.log('Session found for user:', session.user.id);
+        
+        // Test apiaries table access
+        const { data: apiaryTest, error: apiaryError } = await window.supabase
+            .from('apiaries')
+            .select('count')
+            .eq('user_id', session.user.id)
+            .single();
+            
+        if (apiaryError) {
+            console.error('Error accessing apiaries table:', apiaryError);
+            return false;
+        }
+        
+        console.log('Successfully accessed apiaries table');
+        
+        // Test hive_details table access
+        const { data: hiveTest, error: hiveError } = await window.supabase
+            .from('hive_details')
+            .select('count')
+            .limit(1)
+            .single();
+            
+        if (hiveError) {
+            console.error('Error accessing hive_details table:', hiveError);
+            return false;
+        }
+        
+        console.log('Successfully accessed hive_details table');
+        return true;
     } catch (error) {
-        console.error('Error initializing dashboard:', error);
+        console.error('Database verification error:', error);
+        return false;
     }
+}
+
+// Update the document ready event handler to include verification
+document.addEventListener('DOMContentLoaded', async function() {
+    // Initialize Supabase first
+    const isInitialized = await initializeSupabase();
+    if (!isInitialized) {
+        return;
+    }
+    
+    // Verify database connection
+    const isConnected = await verifyDatabaseConnection();
+    if (!isConnected) {
+        return;
+    }
+    
+    // Load dropdowns and set up listeners
+    await forceLoadDropdowns();
+    loadApiarySelector();
+    setupEventListeners();
 });
 
 // Set up sidebar toggle functionality
@@ -171,13 +389,13 @@ async function initializeSupabaseWithRetry(maxRetries = 3) {
 
 // Load user's apiaries into the selector
 async function loadApiarySelector() {
-    console.log('Loading apiary selector...');
+    console.log('Loading apiary selector - START');
     
     try {
         // Get the selector element
         const selector = document.getElementById('apiarySelector');
         if (!selector) {
-            console.error('Apiary selector element not found');
+            console.error('Apiary selector element not found in DOM');
             return;
         }
         
@@ -187,35 +405,42 @@ async function loadApiarySelector() {
         
         // Verify Supabase is initialized
         if (!window.supabase) {
-            console.error('Supabase client not available for loadApiarySelector');
-            selector.innerHTML = '<option value="" disabled selected>Database connection error</option>';
-            return;
+            console.error('Supabase client not available, attempting initialization');
+            await initializeSupabaseWithRetry(3);
+            if (!window.supabase) {
+                selector.innerHTML = '<option value="" disabled selected>Database connection error</option>';
+                return;
+            }
         }
         
         // Check authentication
-        const { data, error } = await window.supabase.auth.getSession();
+        const { data: { session }, error: sessionError } = await window.supabase.auth.getSession();
+        console.log('Session check result:', { session, sessionError });
         
-        if (error) {
-            console.error('Auth error:', error);
+        if (sessionError) {
+            console.error('Auth error:', sessionError);
             selector.innerHTML = '<option value="" disabled selected>Authentication error</option>';
             return;
         }
         
-        if (!data || !data.session) {
+        if (!session) {
             console.warn('No active session found');
             selector.innerHTML = '<option value="" disabled selected>Please log in</option>';
             setTimeout(() => window.location.href = '/login.html', 2000);
             return;
         }
         
-        const userId = data.session.user.id;
-        console.log('User ID:', userId);
+        const userId = session.user.id;
+        console.log('User ID for apiary fetch:', userId);
         
-        // Fetch apiaries directly from the database
+        // Fetch apiaries directly from the database with detailed logging
+        console.log('Fetching apiaries for user:', userId);
         const { data: apiaries, error: apiaryError } = await window.supabase
             .from('apiaries')
             .select('*')
             .eq('user_id', userId);
+            
+        console.log('Raw apiary fetch result:', { apiaries, apiaryError });
             
         if (apiaryError) {
             console.error('Error fetching apiaries:', apiaryError);
@@ -227,11 +452,13 @@ async function loadApiarySelector() {
         selector.innerHTML = '<option value="" disabled selected>Select an apiary...</option>';
         
         if (apiaries && apiaries.length > 0) {
+            console.log('Found apiaries:', apiaries);
             apiaries.forEach(apiary => {
                 const option = document.createElement('option');
                 option.value = apiary.id;
-                option.textContent = apiary.name;
+                option.textContent = apiary.name || `Apiary #${apiary.id}`;
                 selector.appendChild(option);
+                console.log('Added apiary option:', { id: apiary.id, name: apiary.name });
             });
             
             // Enable the selector
@@ -239,11 +466,13 @@ async function loadApiarySelector() {
             
             // Set the first apiary as selected
             selector.value = apiaries[0].id;
+            console.log('Selected first apiary:', apiaries[0]);
             
             // Trigger change event to load hives for the first apiary
             const event = new Event('change');
             selector.dispatchEvent(event);
         } else {
+            console.log('No apiaries found for user');
             selector.innerHTML = '<option value="" disabled selected>No apiaries found</option>';
         }
     } catch (error) {
@@ -254,20 +483,28 @@ async function loadApiarySelector() {
             selector.disabled = true;
         }
     }
+    
+    console.log('Loading apiary selector - END');
 }
 
 // Load hives for the selected apiary
 async function loadHiveSelector(apiaryId) {
-    console.log(`Loading hive selector for apiary ID: ${apiaryId}`);
+    console.log(`Loading hive selector - START (apiary ID: ${apiaryId})`);
     
     try {
         // Ensure Supabase is initialized
-        await ensureSupabaseInitialized();
+        if (!window.supabase) {
+            console.error('Supabase not initialized for loadHiveSelector');
+            await initializeSupabaseWithRetry(3);
+            if (!window.supabase) {
+                throw new Error('Failed to initialize Supabase after retries');
+            }
+        }
         
         // Get the selector element
         const selector = document.getElementById('hiveSelector');
         if (!selector) {
-            console.error('Hive selector element not found');
+            console.error('Hive selector element not found in DOM');
             return;
         }
         
@@ -277,57 +514,53 @@ async function loadHiveSelector(apiaryId) {
         
         // If no apiary is selected, disable the selector and return
         if (!apiaryId) {
+            console.warn('No apiary ID provided to loadHiveSelector');
             selector.innerHTML = '<option value="" disabled selected>Select an apiary first</option>';
             selector.disabled = true;
             return;
         }
         
-        // Try to get hives using data manager first
-        let hives = [];
-        let useDirectMethod = false;
+        // Verify user session
+        const { data: { session }, error: sessionError } = await window.supabase.auth.getSession();
+        console.log('Session check for hive loading:', { session, sessionError });
         
-        if (window.supabaseDataManager) {
-            try {
-                console.log('Attempting to load hives via data manager...');
-                hives = await window.supabaseDataManager.getHives(apiaryId);
-                console.log('Hives from data manager:', hives);
-            } catch (dataManagerError) {
-                console.warn('Failed to get hives from data manager:', dataManagerError);
-                useDirectMethod = true;
-            }
-        } else {
-            console.warn('Data manager not available, using direct method');
-            useDirectMethod = true;
+        if (sessionError || !session) {
+            console.error('Session error or no session for hive loading:', sessionError);
+            selector.innerHTML = '<option value="" disabled selected>Authentication error</option>';
+            return;
         }
         
-        // Fall back to direct method if needed
-        if (useDirectMethod || hives.length === 0) {
-            console.log('Using direct method to load hives...');
-            const { data, error } = await window.supabase
-                .from('hive_details')
-                .select('*')
-                .eq('apiary_id', apiaryId);
-                
-            if (error) {
-                console.error('Error fetching hives:', error);
-                selector.innerHTML = '<option value="" disabled selected>Error loading hives</option>';
-                showAlert('Error loading hives: ' + error.message, 'error');
-                return;
-            }
+        // Direct database query approach
+        console.log(`Fetching hives for apiary ID: ${apiaryId}`);
+        const { data: hives, error: hivesError } = await window.supabase
+            .from('hive_details')
+            .select('*')
+            .eq('apiary_id', apiaryId);
             
-            hives = data;
-            console.log('Hives from direct query:', hives);
+        console.log('Raw hive fetch result:', { hives, hivesError });
+            
+        if (hivesError) {
+            console.error('Error fetching hives:', hivesError);
+            selector.innerHTML = '<option value="" disabled selected>Error loading hives</option>';
+            showAlert('Error loading hives: ' + hivesError.message, 'error');
+            return;
         }
         
         // Update the selector with hives
         selector.innerHTML = '<option value="" disabled selected>Select a hive...</option>';
         
         if (hives && hives.length > 0) {
+            console.log(`Found ${hives.length} hives for apiary ${apiaryId}:`, hives);
             hives.forEach(hive => {
                 const option = document.createElement('option');
                 option.value = hive.node_id || hive.id;
                 option.textContent = hive.hive_name || `Hive #${hive.node_id || hive.id}`;
                 selector.appendChild(option);
+                console.log('Added hive option:', { 
+                    id: hive.id, 
+                    nodeId: hive.node_id, 
+                    name: hive.hive_name 
+                });
             });
             
             // Enable the selector
@@ -335,6 +568,7 @@ async function loadHiveSelector(apiaryId) {
             
             // Set the first hive as selected
             selector.value = hives[0].node_id || hives[0].id;
+            console.log('Selected first hive:', hives[0]);
             
             // Trigger change event to load data for the first hive
             console.log('Triggering change event for first hive');
@@ -344,15 +578,9 @@ async function loadHiveSelector(apiaryId) {
             console.log('No hives found for apiary');
             selector.innerHTML = '<option value="" disabled selected>No hives found</option>';
             selector.disabled = true;
-            
-            // Show add hive button if no hives found
-            const addHiveButton = document.getElementById('addHiveButton');
-            if (addHiveButton) {
-                addHiveButton.style.display = 'inline-block';
-            }
         }
     } catch (error) {
-        console.error('Error loading hive selector:', error);
+        console.error('Error in loadHiveSelector:', error);
         const selector = document.getElementById('hiveSelector');
         if (selector) {
             selector.innerHTML = '<option value="" disabled selected>Error loading hives</option>';
@@ -360,6 +588,8 @@ async function loadHiveSelector(apiaryId) {
         }
         showAlert('Error loading hive selector: ' + error.message, 'error');
     }
+    
+    console.log('Loading hive selector - END');
 }
 
 // Function to set up all event listeners for selectors
@@ -425,13 +655,6 @@ function handleTimeRangeChange(event) {
         loadHiveData(hiveSelector.value, timeRange);
     }
 }
-
-// Initialize selectors when document is ready
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded, initializing selectors');
-    loadApiarySelector();
-    setupEventListeners();
-});
 
 // Subscribe to real-time updates for a hive
 async function setupRealtimeSubscription(hiveNodeId) {
@@ -644,10 +867,7 @@ function updateCharts(metrics) {
 // Update the combined metrics chart
 function updateMetricsChart(metrics) {
     const canvas = document.getElementById('metricsChart');
-    if (!canvas) {
-        console.warn("Combined chart canvas not found");
-        return;
-    }
+    if (!canvas) return;
     
     // Format dates for labels
     const labels = metrics.map(metric => {
@@ -660,17 +880,10 @@ function updateMetricsChart(metrics) {
     const humidityData = metrics.map(metric => Number(metric.humidity));
     
     // Clear existing chart safely
-    try {
-        if (window.metricsChart && typeof window.metricsChart.destroy === 'function') {
-            window.metricsChart.destroy();
-        } else if (window.metricsChart) {
-            console.warn('Invalid metrics chart instance found, cleaning up before recreating');
-            window.metricsChart = null;
-        }
-    } catch (error) {
-        console.error('Error destroying previous metrics chart:', error);
-        window.metricsChart = null;
+    if (window.metricsChart && typeof window.metricsChart.destroy === 'function') {
+        window.metricsChart.destroy();
     }
+    window.metricsChart = null;
     
     // Create datasets array
     const datasets = [
@@ -718,7 +931,7 @@ function updateMetricsChart(metrics) {
         });
     }
     
-    // Create new combined chart with error handling
+    // Create new combined chart
     try {
         window.metricsChart = new Chart(canvas, {
             type: 'line',
@@ -730,48 +943,53 @@ function updateMetricsChart(metrics) {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    'y-temperature': {
+                    yAxes: [{
+                        id: 'y-temperature',
                         type: 'linear',
                         position: 'left',
-                        title: {
+                        scaleLabel: {
                             display: true,
-                            text: 'Temperature (°C)'
+                            labelString: 'Temperature (°C)'
                         }
-                    },
-                    'y-humidity': {
+                    }, {
+                        id: 'y-humidity',
                         type: 'linear',
                         position: 'right',
-                        title: {
+                        scaleLabel: {
                             display: true,
-                            text: 'Humidity (%)'
+                            labelString: 'Humidity (%)'
                         }
-                    },
-                    'y-weight': {
+                    }, {
+                        id: 'y-weight',
                         type: 'linear',
                         position: 'right',
-                        title: {
+                        scaleLabel: {
                             display: true,
-                            text: 'Weight (kg)'
+                            labelString: 'Weight (kg)'
                         },
                         display: metrics.some(metric => metric.weight !== undefined && metric.weight !== null)
-                    },
-                    'y-sound': {
+                    }, {
+                        id: 'y-sound',
                         type: 'linear',
                         position: 'right',
-                        title: {
+                        scaleLabel: {
                             display: true,
-                            text: 'Sound (dB)'
+                            labelString: 'Sound (dB)'
                         },
                         display: metrics.some(metric => metric.sound !== undefined && metric.sound !== null)
-                    }
+                    }],
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Time'
+                        }
+                    }]
                 }
             }
         });
-        console.log('Combined metrics chart created successfully');
     } catch (error) {
-        console.error('Error creating combined metrics chart:', error);
         window.metricsChart = null;
-        showAlert(`Failed to create combined chart: ${error.message}`, 'error');
     }
 }
 

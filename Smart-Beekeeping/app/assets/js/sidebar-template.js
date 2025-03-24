@@ -29,7 +29,11 @@ document.addEventListener('DOMContentLoaded', function() {
           <li class="nav-item"><a class="nav-link ${currentPage === 'profile.html' ? 'active' : ''}" href="profile.html"><i class="fas fa-user"></i><span>Profile</span></a></li>
           <li class="nav-item"><a class="nav-link" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
         </ul>
-        <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
+        <div class="text-center d-none d-md-inline mt-auto">
+          <button class="btn rounded-circle border-0" id="sidebarToggle" type="button">
+            <i class="fas fa-angle-left"></i>
+          </button>
+        </div>
       </div>
     `;
     
@@ -60,6 +64,34 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.setItem('sidebarToggled', 'true');
           }
         });
+      }
+    });
+  }
+
+  // Set up sidebar toggle
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      const sidebar = document.querySelector('.sidebar');
+      
+      // Toggle the sidebar
+      if (sidebar) {
+        sidebar.classList.toggle('toggled');
+        
+        // Store state in localStorage for persistence
+        const isToggled = sidebar.classList.contains('toggled');
+        localStorage.setItem('sidebarToggled', isToggled);
+        
+        // Add/remove classes on document and body for proper styling
+        if (isToggled) {
+          document.documentElement.classList.add('sidebar-collapsed');
+          document.body.classList.add('sidebar-toggled');
+        } else {
+          document.documentElement.classList.remove('sidebar-collapsed');
+          document.body.classList.remove('sidebar-toggled');
+        }
       }
     });
   }

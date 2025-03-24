@@ -66,6 +66,20 @@
     .row.mb-3 .col-12 {
         margin-bottom: 1rem !important;
     }
+
+    /* Style the mobile title in the navbar */
+    .navbar h6.d-md-none {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-left: 5px;
+        margin-right: auto;
+        color: #4e73df;
+    }
+    
+    /* Hide the toggle button completely on mobile */
+    #sidebarToggleTop {
+        display: none !important;
+    }
 }
 
 /* Portrait orientation fixes */

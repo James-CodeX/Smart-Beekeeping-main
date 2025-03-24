@@ -58,4 +58,40 @@ const config = {
 config.init();
 
 // Log configuration status (but don't log sensitive keys in production)
-console.log('Config initialized with Supabase URL:', config.getSupabaseUrl()); 
+console.log('Config initialized with Supabase URL:', config.getSupabaseUrl());
+
+// Initialize Supabase configuration
+async function initializeSupabase() {
+    console.log('Initializing Supabase...');
+    
+    try {
+        // Define fallback values if env.js fails to load
+        const fallbackConfig = {
+            SUPABASE_URL: 'https://bjmdehrjrvbojtewvltf.supabase.co',
+            SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbWRlaHJqcnZib2p0ZXd2bHRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkzNTc4MjMsImV4cCI6MjA1NDkzMzgyM30.8MYy2CGMAKjO0qa62_xgADKegrgmMTdInCVQeilg2X8'
+        };
+        
+        // Use ENV from env.js if available, otherwise use fallback
+        const config = window.ENV || fallbackConfig;
+        console.log('Using Supabase URL:', config.SUPABASE_URL);
+        
+        // Initialize Supabase client
+        window.supabase = supabase.createClient(
+            config.SUPABASE_URL,
+            config.SUPABASE_ANON_KEY
+        );
+        
+        // Test the connection
+        const { data, error } = await window.supabase.from('apiaries').select('count').limit(1);
+        if (error) throw error;
+        
+        console.log('Supabase initialized successfully');
+        return true;
+    } catch (error) {
+        console.error('Error initializing Supabase:', error);
+        return false;
+    }
+}
+
+// Make function globally available
+window.initializeSupabase = initializeSupabase; 

@@ -1,0 +1,123 @@
+/* Mobile Bottom Navigation Styles */
+
+.mobile-nav {
+    display: none;
+}
+
+@media (max-width: 767.98px) {
+    /* Hide sidebar on mobile */
+    .sidebar {
+        display: none !important;
+    }
+    
+    /* Adjust content wrapper for mobile */
+    #content-wrapper {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding-bottom: 70px !important; /* Make room for bottom nav */
+    }
+    
+    /* Show mobile bottom navigation */
+    .mobile-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background-color: #fff;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 1030;
+    }
+    
+    .mobile-nav-items {
+        display: flex;
+        width: 100%;
+        justify-content: space-around;
+        align-items: center;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+    
+    .mobile-nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        height: 100%;
+        padding: 8px 4px;
+        color: #6c757d;
+        transition: color 0.2s ease;
+    }
+    
+    .mobile-nav-item.active {
+        color: var(--primary);
+    }
+    
+    .mobile-nav-icon {
+        font-size: 1.25rem;
+        margin-bottom: 4px;
+    }
+    
+    .mobile-nav-text {
+        font-size: 0.7rem;
+        line-height: 1;
+    }
+    
+    /* Badge for notifications */
+    .mobile-nav-badge {
+        position: absolute;
+        top: 6px;
+        right: calc(50% - 14px);
+        font-size: 0.65rem;
+        padding: 0.25rem 0.4rem;
+        min-width: 16px;
+        height: 16px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Simplified dashboard for mobile */
+    .simplify-mobile {
+        display: none !important;
+    }
+    
+    /* Show simplified elements */
+    .mobile-only {
+        display: block !important;
+    }
+    
+    /* Adjust card layouts for mobile */
+    .col-xl-3.mb-4 {
+        width: 50%;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+    
+    .row {
+        margin-left: -8px;
+        margin-right: -8px;
+    }
+    
+    /* Simplified header */
+    .d-sm-flex.justify-content-between.align-items-center.mb-4 {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    .d-sm-flex.justify-content-between.align-items-center.mb-4 > div {
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    /* Simplify selector area */
+    .form-select {
+        font-size: 0.9rem;
+        padding: 0.375rem 0.75rem;
+    }
+} 

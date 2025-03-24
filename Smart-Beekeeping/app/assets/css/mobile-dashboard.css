@@ -1,0 +1,94 @@
+/* Mobile Dashboard Optimizations */
+
+/* Global selector styles for both desktop and mobile */
+.selector-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.selector-control {
+    display: inline-block;
+    min-width: 120px;
+}
+
+@media (max-width: 767.98px) {
+    /* Simplify dashboard header */
+    .d-sm-flex.justify-content-between.align-items-center.mb-4 {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .d-sm-flex h3 {
+        font-size: 1.5rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    /* Mobile-specific selector styles */
+    .selector-container {
+        width: 100% !important;
+    }
+    
+    .selector-control {
+        min-width: 120px !important;
+        height: 38px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    /* Show only most important info on mobile */
+    .mobile-secondary {
+        display: none !important;
+    }
+    
+    /* Optimize card layouts for mobile */
+    .row .col-md-6.col-xl-3.mb-4 {
+        width: 50% !important;
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+        margin-bottom: 8px !important;
+    }
+    
+    .row {
+        margin-left: -4px !important;
+        margin-right: -4px !important;
+    }
+    
+    /* Optimize cards for small screens */
+    .card {
+        border-radius: 0.375rem !important;
+    }
+    
+    .card-body {
+        padding: 0.75rem !important;
+    }
+    
+    .text-uppercase.fw-bold.text-xs.mb-1 {
+        font-size: 0.7rem !important;
+        margin-bottom: 0.25rem !important;
+    }
+    
+    .text-dark.fw-bold.h5.mb-0 {
+        font-size: 1rem !important;
+    }
+    
+    .col-auto i.fa-2x {
+        font-size: 1.5rem !important;
+    }
+    
+    /* Simplify charts for mobile */
+    .chart-area {
+        height: 12rem !important;
+    }
+    
+    /* Hide the debug button on mobile */
+    #debugButton {
+        display: none !important;
+    }
+    
+    /* Optimize spacing */
+    .container-fluid {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+} 

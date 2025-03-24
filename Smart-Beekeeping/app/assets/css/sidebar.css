@@ -148,14 +148,36 @@ html.navigating .sidebar {
   }
 }
 
-/* Make toggle button work better */
-#sidebarToggle, #sidebarToggleTop {
-  cursor: pointer;
-  transition: transform 0.3s ease;
+/* Position the sidebar toggle button at the bottom of sidebar */
+#sidebarToggle {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    margin: 1rem auto;
 }
 
 #sidebarToggle:hover {
-  transform: rotate(180deg);
+    background-color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Rotate the toggle icon when sidebar is toggled */
+.sidebar.toggled #sidebarToggle .fas {
+    transform: rotate(180deg);
+}
+
+/* For mobile layout */
+@media (max-width: 767.98px) {
+    .text-center.d-none.d-md-inline {
+        display: none !important;
+    }
 }
 
 /* Style consistent with the app theme */
@@ -193,4 +215,44 @@ html, body {
 
 .sidebar.toggled .fa-angle-up {
   transform: rotate(180deg);
+}
+
+/* Fix sidebar expansion on desktop */
+#sidebar.collapsed {
+    width: 6.5rem !important;
+}
+
+#sidebar:not(.collapsed) {
+    width: 14rem !important;
+}
+
+#sidebar {
+    transition: width 0.3s ease-in-out !important;
+}
+
+/* Fix content wrapper margin when sidebar is expanded/collapsed */
+#content-wrapper {
+    transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out !important;
+}
+
+@media (min-width: 768px) {
+    #content-wrapper {
+        margin-left: 14rem;
+        width: calc(100% - 14rem);
+    }
+    
+    #content-wrapper.expanded {
+        margin-left: 6.5rem !important;
+        width: calc(100% - 6.5rem) !important;
+    }
+}
+
+/* Fix sidebar text visibility */
+.sidebar-text {
+    display: inline;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#sidebar.collapsed .sidebar-text {
+    display: none !important;
 } 
