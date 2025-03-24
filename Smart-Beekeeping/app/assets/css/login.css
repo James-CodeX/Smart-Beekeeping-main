@@ -1,1 +1,29 @@
- 
+/* CSS styles for login.html */
+
+.bg-login-image {
+    background: url("../img/login-bee.jpg");
+    background-position: center;
+    background-size: cover;
+}
+
+form.user .form-control-user {
+    font-size: 0.8rem;
+    border-radius: 10rem;
+    padding: 1.5rem 1rem;
+}
+
+form.user .btn-user {
+    font-size: 0.8rem;
+    border-radius: 10rem;
+    padding: 0.75rem 1rem;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.small {
+    font-size: 80%;
+    font-weight: 400;
+} 

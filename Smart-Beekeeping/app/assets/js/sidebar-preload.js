@@ -20,6 +20,7 @@
         display: none !important;
         width: 0 !important;
         opacity: 0 !important;
+        transition: none !important;
       }
       
       /* Position content correctly from the start */
@@ -53,13 +54,41 @@
       // Apply proper classes
       document.body.classList.add('sidebar-toggled');
       const sidebar = document.querySelector('.sidebar');
-      if (sidebar) sidebar.classList.add('toggled');
+      if (sidebar) {
+        sidebar.classList.add('toggled');
+        // Ensure text is hidden
+        const sidebarTexts = sidebar.querySelectorAll('.nav-item .nav-link span, .sidebar-brand-text');
+        sidebarTexts.forEach(text => {
+          text.style.display = 'none';
+          text.style.width = '0';
+          text.style.opacity = '0';
+        });
+      }
       
       // Remove our temporary style after everything is initialized
       setTimeout(function() {
         const tempStyle = document.getElementById('immediate-sidebar-state');
         if (tempStyle) tempStyle.remove();
       }, 500);
+    });
+  } else {
+    // If sidebar should be expanded, ensure text is visible
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebar = document.querySelector('.sidebar');
+      if (sidebar) {
+        // Ensure sidebar is not toggled
+        sidebar.classList.remove('toggled');
+        document.body.classList.remove('sidebar-toggled');
+        document.documentElement.classList.remove('sidebar-collapsed');
+        
+        // Force text to be visible
+        const sidebarTexts = sidebar.querySelectorAll('.nav-item .nav-link span, .sidebar-brand-text');
+        sidebarTexts.forEach(text => {
+          text.style.display = 'inline';
+          text.style.width = 'auto';
+          text.style.opacity = '1';
+        });
+      }
     });
   }
 })(); 

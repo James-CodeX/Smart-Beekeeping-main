@@ -37,11 +37,27 @@ document.addEventListener('DOMContentLoaded', function() {
   if (sidebarState === 'true' && window.innerWidth >= 768) {
     document.body.classList.add('sidebar-toggled');
     if (sidebar) sidebar.classList.add('toggled');
+    
+    // Explicitly hide sidebar text elements
+    const sidebarTexts = document.querySelectorAll('.sidebar .nav-item .nav-link span, .sidebar .sidebar-brand-text');
+    sidebarTexts.forEach(text => {
+      text.style.display = 'none';
+      text.style.opacity = '0';
+      text.style.width = '0';
+    });
   } else if (sidebarState !== 'true') {
     // Ensure all collapsed classes are removed if sidebar should be expanded
     document.documentElement.classList.remove('sidebar-collapsed');
     document.body.classList.remove('sidebar-toggled');
     if (sidebar) sidebar.classList.remove('toggled');
+    
+    // Explicitly show sidebar text elements
+    const sidebarTexts = document.querySelectorAll('.sidebar .nav-item .nav-link span, .sidebar .sidebar-brand-text');
+    sidebarTexts.forEach(text => {
+      text.style.display = 'inline';
+      text.style.opacity = '1';
+      text.style.width = 'auto';
+    });
   }
   
   // Handle sidebar toggle for desktop
@@ -55,8 +71,24 @@ document.addEventListener('DOMContentLoaded', function() {
       // Update html class for immediate CSS rules
       if (sidebar.classList.contains('toggled')) {
         document.documentElement.classList.add('sidebar-collapsed');
+        // Explicitly hide sidebar text elements
+        const sidebarTexts = document.querySelectorAll('.sidebar .nav-item .nav-link span, .sidebar .sidebar-brand-text');
+        sidebarTexts.forEach(text => {
+          text.style.display = 'none';
+          text.style.opacity = '0';
+          text.style.width = '0';
+        });
       } else {
         document.documentElement.classList.remove('sidebar-collapsed');
+        // Explicitly show sidebar text elements with a delay to match the animation
+        setTimeout(() => {
+          const sidebarTexts = document.querySelectorAll('.sidebar .nav-item .nav-link span, .sidebar .sidebar-brand-text');
+          sidebarTexts.forEach(text => {
+            text.style.display = 'inline';
+            text.style.opacity = '1';
+            text.style.width = 'auto';
+          });
+        }, 50); // Small delay to ensure proper timing
       }
       
       // Save state to localStorage
@@ -126,10 +158,26 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.classList.add('sidebar-toggled');
         sidebar.classList.add('toggled');
         document.documentElement.classList.add('sidebar-collapsed');
+        
+        // Explicitly hide sidebar text elements
+        const sidebarTexts = document.querySelectorAll('.sidebar .nav-item .nav-link span, .sidebar .sidebar-brand-text');
+        sidebarTexts.forEach(text => {
+          text.style.display = 'none';
+          text.style.opacity = '0';
+          text.style.width = '0';
+        });
       } else {
         document.body.classList.remove('sidebar-toggled');
         sidebar.classList.remove('toggled');
         document.documentElement.classList.remove('sidebar-collapsed');
+        
+        // Explicitly show sidebar text elements
+        const sidebarTexts = document.querySelectorAll('.sidebar .nav-item .nav-link span, .sidebar .sidebar-brand-text');
+        sidebarTexts.forEach(text => {
+          text.style.display = 'inline';
+          text.style.opacity = '1';
+          text.style.width = 'auto';
+        });
       }
     }
   });

@@ -54,15 +54,25 @@ html.navigating .sidebar {
 
 /* Only apply margin in desktop view */
 @media (min-width: 768px) {
+  /* Default expanded sidebar state */
   #content-wrapper {
     margin-left: 224px; /* Width of the sidebar */
     width: calc(100% - 224px);
+    transition: margin-left 0.3s ease, width 0.3s ease;
   }
   
   /* When sidebar is toggled/collapsed, adjust content */
-  .sidebar.toggled + #content-wrapper {
-    margin-left: 6.5rem;
-    width: calc(100% - 6.5rem);
+  .sidebar.toggled + #content-wrapper,
+  body.sidebar-toggled #content-wrapper {
+    margin-left: 6.5rem !important;
+    width: calc(100% - 6.5rem) !important;
+  }
+  
+  /* When sidebar is expanded, ensure content is positioned correctly */
+  .sidebar:not(.toggled) + #content-wrapper,
+  body:not(.sidebar-toggled) #content-wrapper {
+    margin-left: 224px !important;
+    width: calc(100% - 224px) !important;
   }
   
   /* Ensure that a toggled sidebar stays toggled during navigation */
@@ -110,15 +120,22 @@ html.navigating .sidebar {
 
 /* Handle text visibility in toggled state */
 @media (min-width: 768px) {
-  .sidebar.toggled .nav-item .nav-link span {
+  /* Default state for text elements when sidebar is expanded */
+  .sidebar .nav-item .nav-link span,
+  .sidebar .sidebar-brand-text {
+    display: inline;
+    opacity: 1;
+    width: auto;
+    transition: opacity 0.3s ease, width 0.3s ease;
+  }
+  
+  /* State for text elements when sidebar is collapsed */
+  .sidebar.toggled .nav-item .nav-link span,
+  .sidebar.toggled .sidebar-brand-text {
     width: 0;
     display: none;
     opacity: 0;
     transition: opacity 0.2s ease;
-  }
-  
-  .sidebar.toggled .sidebar-brand-text {
-    display: none;
   }
   
   .sidebar.toggled .nav-link i {

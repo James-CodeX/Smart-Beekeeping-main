@@ -1,0 +1,111 @@
+/* Mobile optimizations for Smart Nyuki */
+
+/* General mobile adjustments - ONLY apply at mobile breakpoints */
+@media (max-width: 767.98px) {
+    /* Smaller heading on mobile */
+    .smart-nyuki-heading {
+        font-size: 1.8rem !important;
+        margin-bottom: 1rem !important;
+    }
+
+    /* Adjust form elements padding on mobile */
+    form.user .form-control-user {
+        padding: 1rem 0.75rem !important;
+        font-size: 0.9rem !important;
+    }
+
+    /* Adjust button padding on mobile */
+    form.user .btn-user {
+        padding: 0.6rem 0.75rem !important;
+    }
+    
+    /* Fix vertical centering on mobile */
+    body.bg-gradient-primary {
+        min-height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    body.bg-gradient-primary .container {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+    
+    body.bg-gradient-primary .container > .card {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        width: 100% !important;
+    }
+    
+    /* Adjust padding for mobile */
+    .p-5 {
+        padding: 1.5rem !important;
+    }
+
+    /* Fix font sizes for mobile */
+    h4 {
+        font-size: 1.25rem !important;
+    }
+
+    /* Form label improvements */
+    .form-check-label {
+        font-size: 0.9rem;
+    }
+
+    /* Make links more tappable on mobile */
+    .small {
+        font-size: 90% !important;
+        padding: 0.5rem 0;
+        display: inline-block;
+    }
+    
+    /* Add additional vertical spacing around password fields on mobile */
+    .row.mb-3 .col-12 {
+        margin-bottom: 1rem !important;
+    }
+}
+
+/* Portrait orientation fixes */
+@media (max-width: 767.98px) and (orientation: portrait) {
+    body.bg-gradient-primary {
+        min-height: 100vh !important;
+    }
+    
+    body.bg-gradient-primary .container > .card {
+        max-width: 90% !important;
+    }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 767.98px) and (orientation: landscape) {
+    body.bg-gradient-primary {
+        min-height: 100% !important;
+        padding: 1rem 0 !important;
+    }
+    
+    body.bg-gradient-primary .container > .card {
+        max-width: 95% !important;
+        margin: 1rem auto !important;
+    }
+}
+
+/* Better tap targets on mobile */
+@media (max-width: 575.98px) {
+    .btn {
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+    }
+
+    /* Adjust form spacing for very small screens */
+    .mb-3 {
+        margin-bottom: 1rem !important;
+    }
+
+    /* Make inputs more user-friendly on small devices */
+    input.form-control {
+        font-size: 16px !important; /* Prevents iOS zoom on focus */
+    }
+} 
