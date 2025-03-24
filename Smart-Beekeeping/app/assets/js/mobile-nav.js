@@ -1,9 +1,14 @@
 // Mobile Navigation Script
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Mobile nav script loaded, window width:', window.innerWidth);
+    
     // Only proceed if we're on a mobile device
     if (window.innerWidth <= 767.98) {
+        console.log('Mobile width detected, adding mobile navigation');
+        
         // Get the current page to highlight the active item
         const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        console.log('Current page:', currentPage);
         
         // Create mobile navigation HTML
         const mobileNavHTML = `
@@ -46,14 +51,24 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Insert navigation at the end of wrapper
         const wrapper = document.getElementById('wrapper');
+        console.log('Wrapper element found:', wrapper ? 'Yes' : 'No');
+        
         if (wrapper) {
             wrapper.insertAdjacentHTML('beforeend', mobileNavHTML);
+            console.log('Mobile navigation inserted');
             
             // Add padding to content wrapper to make room for nav
             const contentWrapper = document.getElementById('content-wrapper');
             if (contentWrapper) {
                 contentWrapper.style.paddingBottom = '70px';
+                console.log('Added padding to content wrapper');
+            } else {
+                console.log('Content wrapper not found');
             }
+        } else {
+            // Alternative approach - add to body if wrapper not found
+            document.body.insertAdjacentHTML('beforeend', mobileNavHTML);
+            console.log('Mobile navigation inserted into body as fallback');
         }
         
         // Sync notification counts if we're on a page with notifications
@@ -82,5 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Then set interval to update
         setInterval(syncNotificationCounts, 5000);
+    } else {
+        console.log('Not adding mobile navigation - screen width > 767.98px');
     }
 }); 
