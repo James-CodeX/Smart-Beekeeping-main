@@ -4,15 +4,15 @@
   "description": "Smart Beekeeping Application",
   "main": "index.js",
   "scripts": {
-    "build": "mkdir -p dist && npm run create-env && cp -r app/* dist/",
+    "build": "node init && mkdir -p dist && npm run create-env && cp -r app/* dist/",
     "create-env": "echo \"window.ENV = { SUPABASE_URL: '$SUPABASE_URL', SUPABASE_ANON_KEY: '$SUPABASE_ANON_KEY' };\" > dist/env.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.0.0"
   },
   "devDependencies": {
-    "netlify-cli": "^15.11.0"
+    "netlify-cli": "^23.13.5"
   },
   "author": "",
   "license": "MIT"
-} 
+}
